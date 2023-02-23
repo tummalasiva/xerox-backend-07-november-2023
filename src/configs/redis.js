@@ -1,27 +1,27 @@
-const redis = require('redis')
+const redis = require("redis");
 
-const { elevateLog } = require('elevate-logger')
-const logger = elevateLog.init()
+const { elevateLog } = require("elevate-logger");
+const logger = elevateLog.init();
 
 module.exports = async function () {
-	const redisClient = redis.createClient({ url: process.env.REDIS_HOST })
+  const redisClient = redis.createClient({ url: process.env.REDIS_HOST });
 
-	try {
-		await redisClient.connect()
-	} catch (error) {
-		console.log(process.env.REDIS_HOST,"error",error);
-		logger.error('Error while making connection to redis client: ', {
-			triggerNotification: true,
-			err: error,
-		})
-	}
+  try {
+    await redisClient.connect();
+  } catch (error) {
+    console.log(process.env.REDIS_HOST, "error", error);
+    logger.error("Error while making connection to redis client: ", {
+      triggerNotification: true,
+      err: error,
+    });
+  }
 
-	redisClient.on('error', (err) => {
-		logger.error('Error while making connection to redis client: ', {
-			triggerNotification: true,
-			error: err,
-		})
-	})
+  redisClient.on("error", (err) => {
+    logger.error("Error while making connection to redis client: ", {
+      triggerNotification: true,
+      error: err,
+    });
+  });
 
-	global.redisClient = redisClient
-}
+  global.redisClient = redisClient;
+};

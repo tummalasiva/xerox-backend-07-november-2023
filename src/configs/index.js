@@ -1,9 +1,8 @@
-
-require('./mongodb')()
+require("./mongodb")();
 // require('./cache')()
-require('./redis')()
+require("./redis")();
 
-require('./aes256cbc')()
-const path = require('path')
+require("./aes256cbc")();
+const path = require("path");
 
-global.PROJECT_ROOT_DIRECTORY = path.join(__dirname, '..')
+global.PROJECT_ROOT_DIRECTORY = path.join(__dirname, "..");

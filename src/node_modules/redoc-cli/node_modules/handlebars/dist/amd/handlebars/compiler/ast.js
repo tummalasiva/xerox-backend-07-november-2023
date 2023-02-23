@@ -1,5 +1,5 @@
-define(['exports', 'module'], function (exports, module) {
-  'use strict';
+define(["exports", "module"], function (exports, module) {
+  "use strict";
 
   var AST = {
     // Public API used to evaluate derived attributes regarding AST nodes
@@ -8,20 +8,26 @@ define(['exports', 'module'], function (exports, module) {
       // * it is an eligible helper, and
       // * it has at least one parameter or hash segment
       helperExpression: function helperExpression(node) {
-        return node.type === 'SubExpression' || (node.type === 'MustacheStatement' || node.type === 'BlockStatement') && !!(node.params && node.params.length || node.hash);
+        return (
+          node.type === "SubExpression" ||
+          ((node.type === "MustacheStatement" ||
+            node.type === "BlockStatement") &&
+            !!((node.params && node.params.length) || node.hash))
+        );
       },
 
       scopedId: function scopedId(path) {
-        return (/^\.|this\b/.test(path.original)
-        );
+        return /^\.|this\b/.test(path.original);
       },
 
       // an ID is simple if it only has one part, and that part is not
       // `..` or `this`.
       simpleId: function simpleId(path) {
-        return path.parts.length === 1 && !AST.helpers.scopedId(path) && !path.depth;
-      }
-    }
+        return (
+          path.parts.length === 1 && !AST.helpers.scopedId(path) && !path.depth
+        );
+      },
+    },
   };
 
   // Must be exported as an object rather than the root of the module as the jison lexer

@@ -1,9 +1,29 @@
-define(['exports', 'module', './handlebars/base', './handlebars/safe-string', './handlebars/exception', './handlebars/utils', './handlebars/runtime', './handlebars/no-conflict'], function (exports, module, _handlebarsBase, _handlebarsSafeString, _handlebarsException, _handlebarsUtils, _handlebarsRuntime, _handlebarsNoConflict) {
-  'use strict';
+define([
+  "exports",
+  "module",
+  "./handlebars/base",
+  "./handlebars/safe-string",
+  "./handlebars/exception",
+  "./handlebars/utils",
+  "./handlebars/runtime",
+  "./handlebars/no-conflict",
+], function (
+  exports,
+  module,
+  _handlebarsBase,
+  _handlebarsSafeString,
+  _handlebarsException,
+  _handlebarsUtils,
+  _handlebarsRuntime,
+  _handlebarsNoConflict
+) {
+  "use strict";
 
   // istanbul ignore next
 
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+  function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : { default: obj };
+  }
 
   // Each of these augment the Handlebars object. No need to setup here.
   // (This is done to easily share code between commonjs and browse envs)
@@ -19,8 +39,8 @@ define(['exports', 'module', './handlebars/base', './handlebars/safe-string', '.
     var hb = new _handlebarsBase.HandlebarsEnvironment();
 
     _handlebarsUtils.extend(hb, _handlebarsBase);
-    hb.SafeString = _SafeString['default'];
-    hb.Exception = _Exception['default'];
+    hb.SafeString = _SafeString["default"];
+    hb.Exception = _Exception["default"];
     hb.Utils = _handlebarsUtils;
     hb.escapeExpression = _handlebarsUtils.escapeExpression;
 
@@ -35,9 +55,9 @@ define(['exports', 'module', './handlebars/base', './handlebars/safe-string', '.
   var inst = create();
   inst.create = create;
 
-  _noConflict['default'](inst);
+  _noConflict["default"](inst);
 
-  inst['default'] = inst;
+  inst["default"] = inst;
 
   module.exports = inst;
 });
