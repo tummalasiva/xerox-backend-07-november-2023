@@ -29,14 +29,26 @@ module.exports = class StoreHelper {
 		try {
 
 			body.createdBy = userId;
-			let stores = await storesData.create(body);			
+
+			let existDoc = await storesData.findOne({ name: body.name });
+
+			if(existDoc){
+				return common.failureResponse({
+					message: 'Store already exist',
+					statusCode: httpStatusCode.bad_request,
+					responseCode: 'CLIENT_ERROR',
+				})
+			}
+			let stores = await storesData.create(body);		
+			console.log("----------------",stores);	
 			if (stores && stores._id) {
 
 				return common.successResponse({
 					statusCode: httpStatusCode.ok,
 					message: "Store created successfully",
 					result: stores,
-			})
+				})
+
 			}else {
 					return common.failureResponse({
 						message: 'Store not created',

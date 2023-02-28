@@ -28,10 +28,10 @@ module.exports = class StoresData {
 
 	static async create(data) {
 		try {
-			 await new Stores(data).save()
-			return true;
+			let store =  await new Stores(data).save()
+			return store;
 		} catch (error) {
-			return error
+			throw error;
 		}
 	}
 
@@ -64,6 +64,7 @@ module.exports = class StoresData {
 						name: 1,
 						address: 1,
 						location: 1,
+						meta:1
 					},
 				},
 				{
