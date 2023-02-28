@@ -30,6 +30,10 @@ const storeSchema = new Schema({
 	createdBy: {
 		type: ObjectID,
 		required: true
+	},
+	updatedBy: {
+		type: ObjectID,
+		required: false
 	}
 	
 })

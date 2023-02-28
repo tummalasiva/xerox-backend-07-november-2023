@@ -55,7 +55,7 @@ module.exports = class StoresData {
 			let data = await Stores.aggregate([
 				{
 					$match: {
-						// deleted: false,
+						deleted: false,
 						$or: [{ name: new RegExp(search, 'i') }],
 					},
 				},
@@ -64,7 +64,11 @@ module.exports = class StoresData {
 						name: 1,
 						address: 1,
 						location: 1,
-						meta:1
+						meta:1,
+						updatedAt:1,
+						createdAt:1,
+						updatedBy:1,
+						createdBy:1
 					},
 				},
 				{

@@ -29,6 +29,8 @@ module.exports = class StoreHelper {
 		try {
 
 			body.createdBy = userId;
+			body.updatedAt = new Date().getTime();
+			body.createdAt = new Date().getTime();
 
 			let existDoc = await storesData.findOne({ name: body.name });
 
@@ -97,6 +99,76 @@ module.exports = class StoreHelper {
 		} catch (error) {
 			throw error
 		}
+}
+
+static async update(id,body,userId) {
+	try {
+
+		
+		let existDoc = await storesData.findOne({ name: body.name , _id: { $ne: id } });
+
+		if(existDoc){
+			return common.failureResponse({
+				message: 'Store already exist',
+				statusCode: httpStatusCode.bad_request,
+				responseCode: 'CLIENT_ERROR',
+			})
+		}
+		body.updatedAt = new Date().getTime();
+		body.updatedBy = userId;
+		let stores = await storesData.updateOneStore({ _id: id },body);		
+		if (stores) {
+
+			return common.successResponse({
+				statusCode: httpStatusCode.ok,
+				message: "Store updated successfully",
+				result: stores,
+			})
+
+		}else {
+				return common.failureResponse({
+					message: 'Failed to update store details',
+					statusCode: httpStatusCode.bad_request,
+					responseCode: 'CLIENT_ERROR',
+				})
+		} 
+		
+		
+	} catch (error) {
+		throw error
+	}
+}
+static async delete(id,userId) {
+	try {
+
+		
+		
+		
+		let stores = await storesData.updateOneStore({ _id: id },{ deleted: true, 
+			updatedBy: userId, 
+			updatedAt: new Date().getTime()
+		 });		
+
+		if (stores) {
+
+			return common.successResponse({
+				statusCode: httpStatusCode.ok,
+				message: "Store deleted successfully",
+				result: stores,
+			})
+
+		}else {
+				return common.failureResponse({
+					message: 'Failed to delete details',
+					statusCode: httpStatusCode.bad_request,
+					responseCode: 'CLIENT_ERROR',
+				})
+		} 
+		
+		
+	} catch (error) {
+		throw error
+	}
 }
 
 }
