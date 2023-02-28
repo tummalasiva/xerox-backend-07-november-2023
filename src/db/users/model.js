@@ -42,45 +42,23 @@ const userSchema = new Schema(
 		designation: [{ value: String, label: String }],
 		location: [{ value: String, label: String }],
 		about: String,
-		shareLink: String,
-		areasOfExpertise: [{ value: String, label: String }],
 		image: String,
 		experience: String,
 		lastLoggedInAt: Date,
-		isAMentor: {
-			type: Boolean,
-			default: false,
-			index: true,
-		},
-		hasAcceptedTAndC: {
-			type: Boolean,
-			default: false,
-		},
 		deleted: {
 			type: Boolean,
 			default: false,
 			required: true,
-		},
-		educationQualification: {
-			type: String,
-			default: null,
 		},
 		refreshTokens: [{ token: String, exp: Number }],
 		otpInfo: {
 			otp: Number,
 			exp: Number,
 		},
-		languages: [{ value: String, label: String }],
 		rating: {
 			type: Object,
-		},
-		preferredLanguage: {
-			type: String,
-			default: 'en',
-		},
-		organisationId: {
-			type: ObjectId,
-		},
+		}
+		
 	},
 	{
 		versionKey: false,

@@ -1,9 +1,3 @@
-/**
- * name : account.js
- * author : Aman
- * created-date : 07-Oct-2021
- * Description : User Account.
- */
 
 // Dependencies
 const accountHelper = require("@services/helper/account");

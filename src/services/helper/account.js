@@ -363,7 +363,9 @@ module.exports = class AccountHelper {
 				isValidOtpExist = false
 			}
 
+			console.log("user.password",user.password);
 			const isPasswordCorrect = bcryptJs.compareSync(bodyData.password, user.password)
+			console.log("isPasswordCorrect",isPasswordCorrect);
 			if (isPasswordCorrect) {
 				return common.failureResponse({
 					message: 'RESET_PREVIOUS_PASSWORD',
@@ -414,6 +416,9 @@ module.exports = class AccountHelper {
 			return common.successResponse({
 				statusCode: httpStatusCode.ok,
 				message: 'OTP_SENT_SUCCESSFULLY',
+				result: {
+					otp:otp
+				}
 			})
 		} catch (error) {
 			throw error
