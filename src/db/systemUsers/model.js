@@ -1,11 +1,5 @@
-/**
- * name : db/users/model
- * author : Aman Karki
- * Date : 10-Nov-2021
- * Description : System User schema data
- */
 
-// Dependencies
+const { ObjectID } = require('bson')
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const mongooseLeanGetter = require('mongoose-lean-getters')
@@ -32,7 +26,32 @@ const userSchema = new Schema({
 		type: String,
 		required: true,
 	},
-	role: String,
+	role: {
+		type: String,
+		required: true
+	},
+	code: {
+		type: String,
+		required: true,
+		unique: true,
+        index: true
+	},
+	mobile:{
+		type: String,
+		required: true
+	},
+	createdBy: {
+		type: ObjectID,
+		required: true
+	},
+	updatedBy: {
+		type: ObjectID,
+		required: false
+	},
+	deleted: {
+        type: Boolean,
+        default:false
+    }
 })
 userSchema.plugin(mongooseLeanGetter)
 const SystemUsers = db.model('systemUsers', userSchema, 'systemUsers')
