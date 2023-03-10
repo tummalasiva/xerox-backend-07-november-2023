@@ -19,6 +19,8 @@ const logger = elevateLog.init()
 
 const algorithm = 'aes-256-cbc'
 
+const aws = require('aws-sdk');
+
 const generateToken = (tokenData, secretKey, expiresIn) => {
 	return jwt.sign(tokenData, secretKey, { expiresIn })
 }
@@ -56,12 +58,60 @@ const getDownloadableUrl = async (imgPath) => {
 		}
 		imgPath = await GcpFileHelper.getDownloadableUrl(options)
 	} else if (process.env.CLOUD_STORAGE === 'AWS') {
+
+		aws.config.update({
+			secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+			accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+			// signatureVersion: config.signature_version,
+			region: process.env.AWS_BUCKET_REGION
+		  })
+		
+		  const s3 = new aws.S3({ });
+
 		const options = {
-			destFilePath: imgPath,
-			bucketName: process.env.DEFAULT_AWS_BUCKET_NAME,
-			bucketRegion: process.env.AWS_BUCKET_REGION,
+			Key: imgPath,
+			Bucket: process.env.DEFAULT_AWS_BUCKET_NAME,
+			Expires: 60 * 5
+			// bucketRegion: process.env.AWS_BUCKET_REGION,
 		}
-		imgPath = await AwsFileHelper.getDownloadableUrl(options.destFilePath, options.bucketName, options.bucketRegion)
+		// const options = {
+		// 	destFilePath: imgPath,
+		// 	bucketName: process.env.DEFAULT_AWS_BUCKET_NAME,
+		// 	 bucketRegion: process.env.AWS_BUCKET_REGION,
+		// }
+
+		try {
+			imgPath = await new Promise((resolve, reject) => {
+			  s3.getSignedUrl('getObject', options, (err, url) => {
+				err ? reject(err) : resolve(url);
+			  });
+			});
+			console.log(imgPath)
+		  } catch (err) {
+			if (err) {
+			  console.log(err)
+			}
+		  }
+
+		// s3.getObject('getObject',options, function (err, data) {
+		// 	if (err) {
+		// 	//   res.status(200);
+		// 	//   res.end('Error Fetching File');
+		// 	console.log("err     --------------",err);
+		// 	}
+		// 	else {
+				
+		// 		console.log("response     --------------",data.Body);
+
+			
+				
+		// 	//   res.attachment(params.Key); // Set Filename
+		// 	//   res.type(data.ContentType); // Set FileType
+		// 	//   res.send(data.Body);        // Send File Buffer
+		// 	}
+		//   });
+
+		// imgPath = await AwsFileHelper.getDownloadableUrl(options.destFilePath, options.bucketName, options.bucketRegion)
 	} else if (process.env.CLOUD_STORAGE === 'AZURE') {
 		const options = {
 			destFilePath: imgPath,

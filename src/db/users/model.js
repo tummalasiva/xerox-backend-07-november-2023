@@ -57,6 +57,9 @@ const userSchema = new Schema(
 		},
 		rating: {
 			type: Object,
+		},
+		image: {
+			type:String
 		}
 		
 	},

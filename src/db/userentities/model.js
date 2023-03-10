@@ -43,6 +43,10 @@ const userEntitySchema = new Schema({
 		type: mongoose.Types.ObjectId,
 		required: true,
 	},
+	store: Array,
+	image: {
+		type: String
+	}
 })
 userEntitySchema.plugin(mongooseLeanGetter)
 const UserEntities = db.model('userEntities', userEntitySchema, 'userEntities')
