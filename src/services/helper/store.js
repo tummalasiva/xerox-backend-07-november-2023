@@ -67,6 +67,7 @@ module.exports = class StoreHelper {
 
     static async list(params) {
 		try {
+
 			
 				let store = await storesData.listStores(
 					// params.query.type,
