@@ -101,23 +101,37 @@ module.exports = class UserEntityHelper {
 	 * @param {Object} bodyData - entity information
 	 * @returns {JSON} - returns entity information
 	 */
-	static async read(bodyData) {
-		const projection = { value: 1, label: 1, _id: 1 }
-		if (!bodyData.deleted) {
-			bodyData.deleted = false
-		}
+	static async read(params) {
+		
 		try {
-			// const key = 'entity_' + bodyData.type
-			// let entities = (await utils.internalGet(key)) || false
-			// if (!entities) {
-				let entities = await userEntitiesData.findAllEntities(bodyData, projection)
-				// await utils.internalSet(key, entities)
-			// }
+			
+				let entities = await userEntitiesData.listEntities(
+					params.pageNo,
+					params.pageSize,
+					params.searchText
+				)
+
+			if (entities[0].data.length < 1) {
+				return common.successResponse({
+					statusCode: httpStatusCode.ok,
+					message: "Entities not found",
+					result: {
+						data: [],
+						count: 0,
+					},
+				})
+			}
+
+
 			return common.successResponse({
 				statusCode: httpStatusCode.ok,
 				message: 'USER_ENTITY_FETCHED_SUCCESSFULLY',
-				result: entities,
+				result: {
+					data: entities[0].data,
+					count: entities[0].count,
+				},
 			})
+
 		} catch (error) {
 			throw error
 		}

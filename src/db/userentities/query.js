@@ -61,4 +61,52 @@ module.exports = class UserEntityData {
 			return error
 		}
 	}
+
+	static async listEntities(page, limit, search) {
+		try {
+			
+			let entitiesData = await UserEntities.aggregate([
+				{
+					$match: {
+						deleted: false,
+						$or: [{ label: new RegExp(search, 'i') }],
+					},
+				},
+				{
+					$project: {
+						label: 1,
+						value: 1,
+						type: 1,
+						// meta:1,
+						updatedAt:1,
+						createdAt:1,
+						updatedBy:1,
+						createdBy:1
+					},
+				},
+				{
+					$sort: { label: 1 },
+				},
+				{
+					$facet: {
+						totalCount: [{ $count: 'count' }],
+						data: [{ $skip: limit * (page - 1) }, { $limit: limit }],
+					},
+				},
+				{
+					$project: {
+						data: 1,
+						count: {
+							$arrayElemAt: ['$totalCount.count', 0],
+						},
+					},
+				},
+			]).collation({ locale: 'en', caseLevel: false })
+
+
+			return entitiesData;
+		} catch (error) {
+			return error
+		}
+	}
 }

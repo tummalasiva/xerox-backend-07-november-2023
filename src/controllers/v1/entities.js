@@ -73,9 +73,9 @@ module.exports = class Entity {
 	 */
 
 	async read(req) {
-		const params = req.query
+	
 		try {
-			const form = await userEntityHelper.read(params)
+			const form = await userEntityHelper.read(req)
 			return form
 		} catch (error) {
 			return error

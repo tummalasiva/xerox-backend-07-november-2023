@@ -71,7 +71,7 @@ const getDownloadableUrl = async (imgPath) => {
 		const options = {
 			Key: imgPath,
 			Bucket: process.env.DEFAULT_AWS_BUCKET_NAME,
-			Expires: 60 * 5
+			Expires: 1000 * 60 * 60 * 24 * 365
 			// bucketRegion: process.env.AWS_BUCKET_REGION,
 		}
 		// const options = {

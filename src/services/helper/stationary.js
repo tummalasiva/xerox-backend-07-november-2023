@@ -51,7 +51,7 @@ module.exports = class StationaryHelper {
 		try {
 			
 				let stationary = await stationarysData.listStationary(
-					// params.query.type,
+					params.query.entityId,
 					params.pageNo,
 					params.pageSize,
 					params.searchText

@@ -49,12 +49,13 @@ module.exports = class StationaryData {
 	}
 
 	
-	static async listStationary(page, limit, search) {
+	static async listStationary(entityId,page, limit, search) {
 		try {
 			
 			let data = await Stationary.aggregate([
 				{
 					$match: {
+						entityId: ObjectId(entityId),
 						deleted: false,
 						$or: [{ name: new RegExp(search, 'i') }],
 					},
