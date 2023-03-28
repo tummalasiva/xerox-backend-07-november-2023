@@ -10,34 +10,39 @@ const orderSchema = new Schema({
         type: ObjectID,
         required: true
     },
-    documents:{
-        type:Array,
-        required: false
-    },
-    copies: {
-		type: Number,
-		required: true,
-	},
-	color: {
-		type: String,
-		required: true,
-	},
-	paperSize: {
-		type: String,
-		required: true,
-	},
-	paperQuality: {
-			type: String,
-			required: true, 
-	},
-    binding: {
-        type: String,
-        required: false,
-    },
-    instructions: {
-        type: String,
-        required: false,
-    },
+    items: [ {
+        documents:{
+            type:Array,
+            required: false
+        },
+        copies: {
+            type: Number,
+            required: true,
+        },
+        color: {
+            type: String,
+            required: true,
+        },
+        paperSize: {
+            type: String,
+            required: true,
+        },
+        paperQuality: {
+                type: String,
+                required: true, 
+        },
+        binding: {
+            type: String,
+            required: false,
+        },
+        instructions: {
+            type: String,
+            required: false,
+        },
+        costPerPage:{
+            type: String,
+        }
+    }],
     storeId: {
         type: ObjectID,
 		required: true
@@ -55,9 +60,7 @@ const orderSchema = new Schema({
         required: false,
         default: "Pending"
     },
-    costPerPage:{
-        type: String,
-    },
+   
     deleted: {
         type: Boolean,
         default:false

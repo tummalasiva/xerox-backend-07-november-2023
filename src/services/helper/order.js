@@ -15,6 +15,8 @@ const httpStatusCode = require('@generics/http-status')
 const common = require('@constants/common')
 const ordersData = require('@db/order/queries')
 
+const storeData = require('@db/store/queries')
+
 
 module.exports = class OrderHelper {
 
@@ -27,12 +29,66 @@ module.exports = class OrderHelper {
 			body.updatedAt = new Date().getTime();
 			body.createdAt = new Date().getTime();
 
+			
 			let orders = await ordersData.create(body);		
-			if (orders && orders._id) {
+			let storeDetails = await storeData.findOne({ _id:body.storeId });
+			console.log("storeDetails",storeDetails);
 
-                orders.totalCost = 100;
-                orders.totalPages = 1;
-                orders['costPerPage'] = 1;
+			orders.totalCost = 0;
+			if (orders && orders._id && orders.items.length > 0) {
+
+				await Promise.all((orders.items).map(async (item) => {
+	
+					let side_price  =0 
+					if(item.side == "one"){
+						side_price = parseInt(storeDetails.meta['costOneSide']);
+					} else {
+						side_price = parseInt(storeDetails.meta['costTwoSide']);
+					}
+
+					let colorPrice = 0; 
+					if(item.color=="bw"){
+						colorPrice = parseInt(storeDetails.meta['costBlack']);
+					} else {
+						colorPrice = parseInt(storeDetails.meta['costColor']);
+					}
+
+					let paperSize = 0; 
+					if(item.paperSize=="a4"){
+						paperSize = parseInt(storeDetails.meta['sizeA4']);
+					} else {
+						paperSize = parseInt(storeDetails.meta['sizeA5']);
+					}
+
+					let paperQuality = 0; 
+					if(item.paperQuality=="100gsm"){
+						paperQuality = parseInt(storeDetails.meta['quality100Gsm']);
+					} else {
+						paperQuality = parseInt(storeDetails.meta['quality80gsm']);
+					}
+
+
+					let binding = 0; 
+					if(item.binding=="Spiral"){
+						binding = parseInt(storeDetails.meta['spiralBinding']);
+					} else  if(item.binding=="Staples"){
+						binding = parseInt(storeDetails.meta['staplesBinding']);
+					} 
+
+					orders.totalPages = 1;
+					let totPages = parseInt(item.copies) * 1;
+
+					orders.totalCost  = orders.totalCost  +  ((parseInt(totPages)) * (side_price+colorPrice+paperSize+paperQuality))+binding;
+
+					// let tot = parseInt(item.copies) *  ( )
+					// orders.totalCost = 100;
+					console.log(binding,"orders.totalCost",totPages,side_price,colorPrice,paperQuality,paperSize);
+					
+					orders['costPerPage'] = 1;
+		
+				}));
+
+               
 				return common.successResponse({
 					statusCode: httpStatusCode.ok,
 					message: "Order created successfully",
