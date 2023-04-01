@@ -4,6 +4,8 @@ const httpStatusCode = require('@generics/http-status')
 const common = require('@constants/common')
 const systemUserData = require('@db/systemUsers/queries')
 
+const permissionData = require('@db/permission/queries')
+
 module.exports = class SystemUsersHelper {
 	/**
 	 * create system users
@@ -82,11 +84,20 @@ module.exports = class SystemUsersHelper {
 				})
 			}
 
+			let rolesInfo = "";
+			if(user.role){
+				rolesInfo= await permissionData.findOne({ role: user.role })
+				
+				user['roleInfo'] = rolesInfo;
+			}
+
+		
 			const tokenDetail = {
 				data: {
 					_id: user._id,
 					email: user.email.address,
 					role: user.role,
+					roleInfo: rolesInfo
 				},
 			}
 
@@ -101,6 +112,7 @@ module.exports = class SystemUsersHelper {
 				message: 'LOGGED_IN_SUCCESSFULLY',
 				result,
 			})
+
 		} catch (error) {
 			throw error
 		}

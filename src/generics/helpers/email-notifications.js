@@ -6,8 +6,22 @@
  */
 
 //Dependencies
-const sgMail = require('@sendgrid/mail')
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+// const sgMail = require('@sendgrid/mail')
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    // port: 587,
+    auth: {
+        user: 'rakesh.doddmane@gmail.com',
+        pass: 'Rak@123$'
+    }
+});
+
+// send email
+
+
 
 /**
  * Send Email
@@ -23,6 +37,8 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
  */
 async function sendEmail(params) {
 	try {
+
+		console.log("------------------------------");
 		let fromMail = process.env.SENDGRID_FROM_MAIL
 		if (params.from) {
 			fromMail = params.from
@@ -42,8 +58,18 @@ async function sendEmail(params) {
 			message['replyTo'] = params.replyTo
 		}
 		try {
-			await sgMail.send(message)
+			console.log("------------------------------");
+			let response = await transporter.sendMail({
+				from: 'rakesh.doddmane@gmail.com',
+				to: 'rakesh.k@pacewisdom.com',
+				subject: 'Test Email Subject',
+				text: 'Example Plain Text Message Body'
+			});
+
+			console.log("------------------------------",response);
+			// await sgMail.send(message)
 		} catch (error) {
+			console.log("==================",error);
 			if (error.response) {
 				return error
 			}

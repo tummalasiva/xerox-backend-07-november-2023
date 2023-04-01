@@ -12,7 +12,7 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 const utilsHelper = require('@generics/utils')
 const httpStatusCode = require('@generics/http-status')
-// const emailNotifications = require('@generics/helpers/email-notifications')
+const emailNotifications = require('@generics/helpers/email-notifications')
 
 const common = require('@constants/common')
 const usersData = require('@db/users/queries')
@@ -21,6 +21,8 @@ const kafkaCommunication = require('@generics/kafka-communication')
 const systemUserData = require('@db/systemUsers/queries')
 const FILESTREAM = require('@generics/file-stream')
 const utils = require('@generics/utils')
+
+// const systemUserData = require('@db/systemUsers/queries')
 
 module.exports = class AccountHelper {
 	/**
@@ -476,18 +478,18 @@ module.exports = class AccountHelper {
 				}
 			}
 
-			const templateData = await notificationTemplateData.findOneEmailTemplate(
-				process.env.REGISTRATION_OTP_EMAIL_TEMPLATE_CODE
-			)
+			// const templateData = await notificationTemplateData.findOneEmailTemplate(
+			// 	process.env.REGISTRATION_OTP_EMAIL_TEMPLATE_CODE
+			// )
 
 			// if (templateData) {
 			// 	// Push otp to kafka
-			// 	const payload =  {
-			// 			to: bodyData.email,
-			// 			subject: templateData.subject,
-			// 			body: utilsHelper.composeEmailBody(templateData.body, { name: bodyData.name, otp }),
-			// 		}
-			// 	let result = await emailNotifications.sendEmail(payload)
+				// const payload =  {
+				// 		to: bodyData.email,
+				// 		subject: "asdad",
+				// 		body: utilsHelper.composeEmailBody("adad", { name: bodyData.name, otp }),
+				// 	}
+				// let result = await emailNotifications.sendEmail(payload)
 
 			// }
 			// if (process.env.APPLICATION_ENV === 'development') {
