@@ -88,7 +88,7 @@ static async update(id,body,userId) {
 	try {
 
 		
-		let existDoc = await permissionsData.findOne({ name: body.name , _id: { $ne: id } });
+		let existDoc = await permissionsData.findOne({ role: body.name , _id: { $ne: id } });
 
 		if(existDoc){
 			return common.failureResponse({
