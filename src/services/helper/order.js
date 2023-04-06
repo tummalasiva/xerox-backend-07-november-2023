@@ -20,7 +20,7 @@ const storeData = require('@db/store/queries')
 // const pdf = require('pdf-page-counter');
 
 const pdf =  require("page-count");
-const fs =  require("fs");
+
 var request = require('request-promise');
 
 
