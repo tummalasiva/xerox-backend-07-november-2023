@@ -17,7 +17,12 @@ const ordersData = require('@db/order/queries')
 
 const storeData = require('@db/store/queries')
 
-const pdf = require('pdf-page-counter');
+// const pdf = require('pdf-page-counter');
+
+const pdf =  require("page-count");
+const fs =  require("fs");
+var request = require('request-promise');
+
 
 module.exports = class OrderHelper {
 
@@ -80,10 +85,13 @@ module.exports = class OrderHelper {
 					orders.totalPages = 1;
 
 					let pdfPath = await utilsHelper.getDownloadableUrl(item.documents[0])
-					let data = await pdf(pdfPath);
-					let totPages = parseInt(item.copies) * data.numpages;
+					let buffer = await request.get(pdfPath, { encoding: null }); 
+					let pagesPdf = await pdf.PdfCounter.count(buffer);
+
+					// let data = await pdf(pdfPath);
+					let totPages = parseInt(item.copies) * pagesPdf;
 					
-					orders['totalPages'] = data.numpages;
+					orders['totalPages'] = pagesPdf;
 					orders.totalCost  = orders.totalCost  +  ((parseInt(totPages)) * (side_price+colorPrice+paperSize+paperQuality))+binding;
 					// let tot = parseInt(item.copies) *  ( )
 					// orders.totalCost = 100;
