@@ -19,13 +19,11 @@ module.exports = class Payment {
         const params = req.body;
         try {
 
-            console.log("======================");
-            console.log("======================",params);
-            
-            console.log("======================");
-            
-        // const result = await paymentHelper.order(params,req.decodedToken._id);
-        return;
+            const result = await paymentHelper.confirm(params,req.decodedToken._id);
+            return result;
+
+           
+      
         } catch (error) {
         return error;
         }

@@ -10,52 +10,82 @@ const paymentData = require('@db/payment/queries')
 
 const Razorpay = require('razorpay');
 
+var crypto = require("crypto");
+
 var instance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-  });
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 
 module.exports = class paymentHelper {
 
-static async order(params,userId) {
-	try {
+  static async order(params, userId) {
+    try {
 
-        let orders = await instance.orders.create({
-            "amount": params.amount,
-            "currency": "INR",
-            "receipt": params.receipt,
-            "partial_payment": false,
-            "notes":params.notes
-          })
-          
+      let orders = await instance.orders.create({
+        "amount": params.amount,
+        "currency": "INR",
+        "receipt": params.receipt,
+        "partial_payment": false,
+        "notes": params.notes
+      })
 
-          orders['userId'] =userId;
-          orders['orderId'] = params.orderId;
-          orders['paymentId'] = orders.id;
-          delete orders.id;
-          
-          let paymentInfo = await paymentData.create(orders);		
-          
 
-         return common.successResponse({
-            statusCode: httpStatusCode.ok,
-            message: "Payment Order fetched successfully",
-            result: paymentInfo,
-        })
+      orders['userId'] = userId;
+      orders['orderId'] = params.orderId;
+      orders['paymentId'] = orders.id;
+      delete orders.id;
 
-	
-		
-		
-	} catch (error) {
+      let paymentInfo = await paymentData.create(orders);
 
-        console.log("err",error)
-        return common.failureResponse({
-            message: 'Failed to create payment order ' + error,
-            statusCode: httpStatusCode.bad_request,
-            responseCode: 'CLIENT_ERROR',
-        })
-	
-	}
-}
+
+      return common.successResponse({
+        statusCode: httpStatusCode.ok,
+        message: "Payment Order fetched successfully",
+        result: paymentInfo,
+      })
+
+
+
+
+    } catch (error) {
+
+      console.log("err", error)
+      return common.failureResponse({
+        message: 'Failed to create payment order ' + error,
+        statusCode: httpStatusCode.bad_request,
+        responseCode: 'CLIENT_ERROR',
+      })
+
+    }
+  }
+
+
+  static async confirm(params,userId) {
+    try {
+
+      let body = params.response.razorpay_order_id + "|" + params.response.razorpay_payment_id;
+      var expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(body.toString())
+        .digest('hex');
+
+      console.log("sig received ", params.response.razorpay_signature);
+      console.log("sig generated ", expectedSignature);
+      var response = { "signatureIsValid": "false" }
+      if (expectedSignature === params.response.razorpay_signature)
+        response = { "signatureIsValid": "true" }
+      return response;
+
+    } catch (error) {
+
+      console.log("err", error)
+      return common.failureResponse({
+        message: 'Failed to create payment order ' + error,
+        statusCode: httpStatusCode.bad_request,
+        responseCode: 'CLIENT_ERROR',
+      })
+
+    }
+  }
 }
