@@ -62,7 +62,7 @@ module.exports = class paymentHelper {
   }
 
 
-  static async confirm(params,userId) {
+  static async confirm(params) {
     try {
 
       let body = params.response.razorpay_order_id + "|" + params.response.razorpay_payment_id;

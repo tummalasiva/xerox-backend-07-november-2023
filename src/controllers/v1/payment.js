@@ -19,7 +19,7 @@ module.exports = class Payment {
         const params = req.body;
         try {
 
-            const result = await paymentHelper.confirm(params,req.decodedToken._id);
+            const result = await paymentHelper.confirm(params);
             return result;
 
            
