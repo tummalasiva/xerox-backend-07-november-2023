@@ -68,6 +68,8 @@ module.exports = (app) => {
 			return next(error)
 		}
 
+
+		
 		if (
 			controllerResponse &&
 			controllerResponse.statusCode !== 200 &&
@@ -77,14 +79,23 @@ module.exports = (app) => {
 			/* If error obtained then global error handler gets executed */
 			return next(controllerResponse)
 		}
-		if (controllerResponse) {
+		
+		if (controllerResponse && controllerResponse.statusCode) {
+			
+			if(controllerResponse.custom){
+				// delete controllerResponse.custom;
+				// delete controllerResponse.statusCode;
+				res.status(controllerResponse.statusCode).json(controllerResponse);
+				return;
+			}
+
 			res.status(controllerResponse.statusCode).json({
 				responseCode: controllerResponse.responseCode,
 				message: req.t(controllerResponse.message),
 				result: controllerResponse.result,
 				meta: controllerResponse.meta,
 			})
-		}
+		} 
 	}
 
 	app.all('/xerox/:version/:controller/:method', validator, router)
@@ -101,6 +112,8 @@ module.exports = (app) => {
 
 	// Global error handling middleware, should be present in last in the stack of a middleware's
 	app.use((error, req, res, next) => {
+
+		console.log("error",error);
 		const status = error.statusCode || 500
 		const responseCode = error.responseCode || 'SERVER_ERROR'
 		const message = error.message || ''

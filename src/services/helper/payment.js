@@ -65,16 +65,16 @@ module.exports = class paymentHelper {
   static async confirm(params) {
     try {
 
-      let body = params.response.razorpay_order_id + "|" + params.response.razorpay_payment_id;
+      let body = params.razorpay_order_id + "|" + params.razorpay_payment_id;
       var expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
         .update(body.toString())
         .digest('hex');
 
-      console.log("sig received ", params.response.razorpay_signature);
+      console.log("sig received ", params.razorpay_signature);
       console.log("sig generated ", expectedSignature);
-      var response = { "signatureIsValid": "false" }
-      if (expectedSignature === params.response.razorpay_signature)
-        response = { "signatureIsValid": "true" }
+      var response = { "signatureIsValid": "false",statusCode:200 }
+      if (expectedSignature === params.razorpay_signature)
+        response = { "signatureIsValid": "true", statusCode:200, custom:true }
       return response;
 
     } catch (error) {
