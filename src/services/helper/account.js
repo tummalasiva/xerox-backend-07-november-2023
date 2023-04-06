@@ -12,7 +12,7 @@ const ObjectId = require('mongoose').Types.ObjectId
 
 const utilsHelper = require('@generics/utils')
 const httpStatusCode = require('@generics/http-status')
-const emailNotifications = require('@generics/helpers/email-notifications')
+const emailNotifications = require('@generics/helpers/notifications')
 
 const common = require('@constants/common')
 const usersData = require('@db/users/queries')
