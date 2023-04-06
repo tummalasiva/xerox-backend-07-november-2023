@@ -25,7 +25,7 @@ module.exports = class Payment {
             console.log("======================");
             
         // const result = await paymentHelper.order(params,req.decodedToken._id);
-        return result;
+        return;
         } catch (error) {
         return error;
         }

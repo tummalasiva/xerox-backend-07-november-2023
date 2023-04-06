@@ -49,6 +49,7 @@ module.exports = {
     // "xerox/v1/systemUsers/create",
     "xerox/v1/systemUsers/login",
     "xerox/v1/organisations/list",
+    "xerox/v1/payment/confirm",
   ],
   internalAccessUrls: [
     "bulkCreateMentors",
