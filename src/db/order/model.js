@@ -41,6 +41,10 @@ const orderSchema = new Schema({
         },
         costPerPage:{
             type: String,
+        },
+        totalPages:{
+            type: Number,
+            required: true,
         }
     }],
     storeId: {
@@ -60,7 +64,6 @@ const orderSchema = new Schema({
         required: false,
         default: "Pending"
     },
-   
     deleted: {
         type: Boolean,
         default:false
@@ -72,8 +75,17 @@ const orderSchema = new Schema({
 	updatedBy: {
 		type: ObjectID,
 		required: false
-	}
-	
+	},
+    paidAt:{
+        type:Date
+    },
+	isPaid: {
+        type: Boolean,
+        default:false
+    },
+    paymentId: {
+        type:String
+    }
 })
 orderSchema.plugin(mongooseLeanGetter)
 

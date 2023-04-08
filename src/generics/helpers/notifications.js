@@ -10,6 +10,8 @@
 // sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 const nodemailer = require('nodemailer');
 
+const axios = require('axios');
+
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     // port: 587,
@@ -87,6 +89,39 @@ async function sendEmail(params) {
 	}
 }
 
+
+async function sendSms(params) {
+	try {
+
+		params['sender'] = process.env.SMS_SENDER_ID;
+		params['service'] = "T";
+
+		let data = await axios({
+			method: 'post',
+			headers: {'Authorization': "Bearer "+process.env.SMS_ACCESS_KEY, 'Content-Type':'application/json' },
+			url: process.env.SMS_ENDPOINT,
+			data: params
+		  });
+
+	
+
+		return {
+			status: 'success',
+			message: data,
+		}
+
+	} catch (error) {
+		return {
+			status: 'failed',
+			message: 'Mail server is down, please try after some time',
+			errorObject: error,
+		}
+	}
+}
+
+
+
 module.exports = {
 	sendEmail: sendEmail,
+	sendSms: sendSms
 }

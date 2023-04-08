@@ -30,7 +30,11 @@ module.exports = class Account {
 
     async list(req) {
         try {
-          const result = await orderHelper.list(req,req.decodedToken._id);
+          const result = await orderHelper.list(
+            req,
+            req.decodedToken._id,
+            req.roleInfo ? req.roleInfo : "customer",
+            );
           return result;
         } catch (error) {
           return error;

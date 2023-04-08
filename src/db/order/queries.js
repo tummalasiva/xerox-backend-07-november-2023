@@ -49,15 +49,14 @@ module.exports = class OrdersData {
 	}
 
 	
-	static async listOrders(userId,page, limit, search) {
+	static async listOrders(filters,page, limit, search) {
 		try {
 
-			console.log("userId",userId);
+			console.log("filters",filters);
 			let data = await Orders.aggregate([
 				{
 					$match: {
-						deleted: false,
-                        userId: ObjectId(userId),
+					   $and:[ filters],
 						// $or: [{ name: new RegExp(search, 'i') }],
 					},
 				},
@@ -77,7 +76,10 @@ module.exports = class OrdersData {
 						updatedAt:1,
 						createdAt:1,
 						updatedBy:1,
-						createdBy:1
+						createdBy:1,
+						items:1,
+						isPaid:1,
+						paidAt:1
 					},
 				},
 				{

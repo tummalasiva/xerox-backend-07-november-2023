@@ -8,6 +8,8 @@ const httpStatusCode = require('@generics/http-status')
 const common = require('@constants/common')
 const paymentData = require('@db/payment/queries')
 
+const orderData = require('@db/order/queries')
+
 const Razorpay = require('razorpay');
 
 var crypto = require("crypto");
@@ -70,11 +72,27 @@ module.exports = class paymentHelper {
         .update(body.toString())
         .digest('hex');
 
-      console.log("sig received ", params.razorpay_signature);
-      console.log("sig generated ", expectedSignature);
+
+        
+
+
       var response = { "signatureIsValid": "false",statusCode:200 }
-      if (expectedSignature === params.razorpay_signature)
+      if (expectedSignature === params.razorpay_signature){
         response = { "signatureIsValid": "true", statusCode:200, custom:true }
+
+        let paymentInfo = await paymentData.findOne({ paymentId: params.razorpay_payment_id });
+
+        let paymentUpdate = await paymentData.update({ paymentId: params.razorpay_payment_id },{ paidAt:new Date(), isPaid:true  });
+        
+        let  orderUpdate = await orderData.updateOneOrder({ _id: paymentInfo.orderId  },
+          { paymentId:paymentInfo._id, paidAt:new Date(), isPaid:true,status:"paid" 
+          });
+        console.log("-----------",paymentInfo.orderId );
+
+
+      }
+
+      
       return response;
 
     } catch (error) {

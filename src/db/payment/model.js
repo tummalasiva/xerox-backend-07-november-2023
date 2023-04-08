@@ -42,6 +42,13 @@ const stationarySchema = new Schema({
     deleted: {
         type: Boolean,
         default:false
+    },
+    isPaid:{
+        type:Boolean,
+        default: false
+    },
+    paidAt:{
+        type:Date
     }
 	
 })

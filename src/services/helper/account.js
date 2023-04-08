@@ -21,6 +21,7 @@ const kafkaCommunication = require('@generics/kafka-communication')
 const systemUserData = require('@db/systemUsers/queries')
 const FILESTREAM = require('@generics/file-stream')
 const utils = require('@generics/utils')
+const notifications = require('../../generics/helpers/notifications')
 
 // const systemUserData = require('@db/systemUsers/queries')
 
@@ -184,12 +185,14 @@ module.exports = class AccountHelper {
 				})
 			}
 
+			console.log("user",user);
+
 			const tokenDetail = {
 				data: {
 					_id: user._id,
 					email: user.email.address,
 					name: user.name,
-					isAMentor: user.isAMentor,
+					role: user.role
 				},
 			}
 
@@ -449,6 +452,16 @@ module.exports = class AccountHelper {
 				})
 			}
 
+			const userMob = await usersData.findOne({ 'mobile': bodyData.mobile })
+			if (userMob) {
+				return common.failureResponse({
+					message: 'Mobile number already exist',
+					statusCode: httpStatusCode.bad_request,
+					responseCode: 'CLIENT_ERROR',
+				})
+			}
+
+
 			const userData = await utilsHelper.redisGet(bodyData.email.toLowerCase())
 
 			if (userData && userData.action === 'signup') {
@@ -460,12 +473,12 @@ module.exports = class AccountHelper {
 			if (!isValidOtpExist) {
 				otp = Math.floor(Math.random() * 900000 + 100000) // 6 digit otp
 				const redisData = {
-					verify: bodyData.email.toLowerCase(),
+					verify: bodyData.mobile.toLowerCase(),
 					action: 'signup',
 					otp,
 				}
 				const res = await utilsHelper.redisSet(
-					bodyData.email.toLowerCase(),
+					bodyData.mobile.toLowerCase(),
 					redisData,
 					common.otpExpirationTime
 				)
@@ -478,20 +491,20 @@ module.exports = class AccountHelper {
 				}
 			}
 
-			// const templateData = await notificationTemplateData.findOneEmailTemplate(
-			// 	process.env.REGISTRATION_OTP_EMAIL_TEMPLATE_CODE
-			// )
+			
+			let smsInfo = await notifications.sendSms({
+				"to": bodyData.mobile,
+				"message": utilsHelper.composeEmailBody(common.SIGN_UP_OTP, { name: bodyData.name, otp }),
+				"template_id":process.env.SIGNUP_OTP_TEMPLATE_ID
+		   });
 
-			// if (templateData) {
-			// 	// Push otp to kafka
-				// const payload =  {
-				// 		to: bodyData.email,
-				// 		subject: "asdad",
-				// 		body: utilsHelper.composeEmailBody("adad", { name: bodyData.name, otp }),
-				// 	}
-				// let result = await emailNotifications.sendEmail(payload)
+		   	
+			let smsInfo2 = await notifications.sendSms({
+				"to": bodyData.mobile,
+				"message": utilsHelper.composeEmailBody(common.FORGOT_OTP, { name: bodyData.name, otp }),
+				"template_id":process.env.FORGOT_OTP_TEMPLATE_ID
+		   });
 
-			// }
 			// if (process.env.APPLICATION_ENV === 'development') {
 				console.log(otp)
 			// }

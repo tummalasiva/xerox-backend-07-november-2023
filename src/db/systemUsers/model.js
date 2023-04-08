@@ -51,7 +51,9 @@ const userSchema = new Schema({
 	deleted: {
         type: Boolean,
         default:false
-    }
+    },
+	store:Array
+
 })
 userSchema.plugin(mongooseLeanGetter)
 const SystemUsers = db.model('systemUsers', userSchema, 'systemUsers')

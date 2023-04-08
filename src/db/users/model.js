@@ -15,6 +15,13 @@ const { ObjectId } = require('mongodb')
 
 const userSchema = new Schema(
 	{
+		mobile: {
+			type: String,
+			index: {
+				unique: true,
+			},
+			required: true
+		},
 		email: {
 			address: {
 				type: String,

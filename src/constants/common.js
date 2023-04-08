@@ -65,4 +65,6 @@ module.exports = {
   refreshTokenExpiryInMs:
     Number(process.env.REFRESH_TOKEN_EXPIRY) * 24 * 60 * 60 * 1000,
   otpExpirationTime: process.env.OTP_EXP_TIME, // In Seconds
+  SIGN_UP_OTP:"Dear customer, use this One Time Password {otp} to log in to your {name} account. This OTP will be valid for the next 15 mins.",
+  FORGOT_OTP:"Dear {name}, {otp} is OTP for your reset password and valid for next 15minutes, please do not share with anyone -webspruce"
 };

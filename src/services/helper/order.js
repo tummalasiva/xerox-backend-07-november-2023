@@ -16,6 +16,7 @@ const common = require('@constants/common')
 const ordersData = require('@db/order/queries')
 
 const storeData = require('@db/store/queries')
+const ObjectId = require('mongoose').Types.ObjectId
 
 // const pdf = require('pdf-page-counter');
 
@@ -32,19 +33,17 @@ module.exports = class OrderHelper {
 
             body.userId = userId;
 			body.createdBy = userId;
-			body.updatedAt = new Date().getTime();
-			body.createdAt = new Date().getTime();
-
-			
-			let orders = await ordersData.create(body);		
+			body.updatedAt = new Date().toISOString();
+			body.createdAt = new Date().toISOString();
+		
 			let storeDetails = await storeData.findOne({ _id:body.storeId });
 
-			
-			
-			orders.totalCost = 0;
-			if (orders && orders._id && orders.items.length > 0) {
+			body.totalCost = 0;
+			body.totalPages = 0;
 
-				await Promise.all((orders.items).map(async (item) => {
+			if (body  && body.items.length > 0) {
+
+				await Promise.all((body.items).map(async (item,index) => {
 	
 					let side_price  =0 
 					if(item.side == "one"){
@@ -53,12 +52,16 @@ module.exports = class OrderHelper {
 						side_price = parseInt(storeDetails.meta['costTwoSide']);
 					}
 
+					body.items[index]['side'] = item.side;
+
 					let colorPrice = 0; 
 					if(item.color=="bw"){
 						colorPrice = parseInt(storeDetails.meta['costBlack']);
 					} else {
 						colorPrice = parseInt(storeDetails.meta['costColor']);
 					}
+
+					body.items[index]['color'] = item.color;
 
 					let paperSize = 0; 
 					if(item.paperSize=="a4"){
@@ -67,12 +70,15 @@ module.exports = class OrderHelper {
 						paperSize = parseInt(storeDetails.meta['sizeA5']);
 					}
 
+					body.items[index]['paperSize'] = item.paperSize;
+
 					let paperQuality = 0; 
 					if(item.paperQuality=="100gsm"){
 						paperQuality = parseInt(storeDetails.meta['quality100Gsm']);
 					} else {
 						paperQuality = parseInt(storeDetails.meta['quality80gsm']);
 					}
+					body.items[index]['paperQuality'] = item.paperQuality;
 
 
 					let binding = 0; 
@@ -81,25 +87,34 @@ module.exports = class OrderHelper {
 					} else  if(item.binding=="Staples"){
 						binding = parseInt(storeDetails.meta['staplesBinding']);
 					} 
+					body.items[index]['binding'] = item.binding;
 
-					orders.totalPages = 1;
-
+					
 					let pdfPath = await utilsHelper.getDownloadableUrl(item.documents[0])
 					let buffer = await request.get(pdfPath, { encoding: null }); 
 					let pagesPdf = await pdf.PdfCounter.count(buffer);
 
+
+					body.items[index]['totalPages'] = pagesPdf;
 					// let data = await pdf(pdfPath);
 					let totPages = parseInt(item.copies) * pagesPdf;
+
+
+					body.totalPages = body.totalPages  + pagesPdf;
 					
-					orders['totalPages'] = pagesPdf;
-					orders.totalCost  = orders.totalCost  +  ((parseInt(totPages)) * (side_price+colorPrice+paperSize+paperQuality))+binding;
+					// body['totalPages'] = pagesPdf;
+					body.totalCost  = body.totalCost  +  ((parseInt(totPages)) * (side_price+colorPrice+paperSize+paperQuality))+binding;
 					// let tot = parseInt(item.copies) *  ( )
 					// orders.totalCost = 100;
-					console.log(binding,"orders.totalCost",totPages,side_price,colorPrice,paperQuality,paperSize);
+					console.log(index,"orders.totalCost",totPages,side_price,colorPrice,paperQuality,paperSize);
 					
-					orders['costPerPage'] = 1;
+					body['costPerPage'] = 1;
 		
 				}));
+
+				let orders = await ordersData.create(body);		
+
+			
 
                
 				return common.successResponse({
@@ -118,16 +133,31 @@ module.exports = class OrderHelper {
 			
 			
 		} catch (error) {
+			console.log("-----",error);
 			throw error
 		}
 	}
 
-    static async list(params,userId) {
+    static async list(params,userId,role) {
 		try {
+
+				let filters = { }
+				if(role=="customer"){
+					filters['userId'] = ObjectId(userId); 
+				}
 			
+				if(params.query.storeId){
+					 filters['storeId'] = ObjectId(params.query.storeId); 
+				}
+				if(params.query.startDate && params.query.endDate){
+					filters['createdAt'] = {
+						$gte: new Date(params.query.startDate),
+						$lte: new Date(params.query.endDate),
+					}
+				}
 				let order = await ordersData.listOrders(
 					// params.query.type,
-                    userId,
+                    filters,
 					params.pageNo,
 					params.pageSize,
 					params.searchText

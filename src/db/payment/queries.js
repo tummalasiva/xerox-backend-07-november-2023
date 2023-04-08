@@ -35,4 +35,16 @@ module.exports = class PaymentData {
 		}
 	}
 
+	static async update(filter, update, options = {}) {
+		try {
+			const res = await Payment.updateOne(filter, update, options)
+			if ((res.n === 1 && res.nModified === 1) || (res.matchedCount === 1 && res.modifiedCount === 1)) {
+				return true
+			} else {
+				return false
+			}
+		} catch (error) {
+			return error
+		}
+	}
 }
