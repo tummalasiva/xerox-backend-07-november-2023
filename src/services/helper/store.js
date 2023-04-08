@@ -16,11 +16,8 @@ const httpStatusCode = require('@generics/http-status')
 
 const common = require('@constants/common')
 const storesData = require('@db/store/queries')
-const notificationTemplateData = require('@db/notification-template/query')
-const kafkaCommunication = require('@generics/kafka-communication')
-const systemUserData = require('@db/systemUsers/queries')
-const FILESTREAM = require('@generics/file-stream')
-const utils = require('@generics/utils')
+
+const systemUsersData = require('@db/systemUsers/queries')
 
 module.exports = class StoreHelper {
 
@@ -42,7 +39,6 @@ module.exports = class StoreHelper {
 				})
 			}
 			let stores = await storesData.create(body);		
-			console.log("----------------",stores);	
 			if (stores && stores._id) {
 
 				return common.successResponse({
@@ -68,9 +64,25 @@ module.exports = class StoreHelper {
     static async list(params) {
 		try {
 
+			let filters = {};
+
+			let userInfo =  await systemUsersData.findOne({ _id: params.decodedToken._id });
 			
+			if(userInfo){
+
+				let ids = userInfo.store.map( function(storeIds){
+					let ids = ObjectId(storeIds);
+					return ids
+				})
+
+				 filters = {
+					_id: { $in: ids  }
+				}
+			}
+			console.log("filters",filters);
+
 				let store = await storesData.listStores(
-					// params.query.type,
+					filters,
 					params.pageNo,
 					params.pageSize,
 					params.searchText

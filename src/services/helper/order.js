@@ -149,6 +149,11 @@ module.exports = class OrderHelper {
 				if(params.query.storeId){
 					 filters['storeId'] = ObjectId(params.query.storeId); 
 				}
+
+				if(params.query.status){
+					filters['status'] = params.query.status; 
+			   }
+
 				if(params.query.startDate && params.query.endDate){
 					filters['createdAt'] = {
 						$gte: new Date(params.query.startDate),

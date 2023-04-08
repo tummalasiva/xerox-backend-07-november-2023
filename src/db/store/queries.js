@@ -49,14 +49,16 @@ module.exports = class StoresData {
 	}
 
 	
-	static async listStores(page, limit, search) {
+	static async listStores(filters,page, limit, search) {
 		try {
 			
+
+			filters['deleted'] = false;
 			let data = await Stores.aggregate([
 				{
 					$match: {
-						deleted: false,
-						$or: [{ name: new RegExp(search, 'i') }],
+						$and:[ filters ],
+						// $or: [{ name: new RegExp(search, 'i') }],
 					},
 				},
 				{
