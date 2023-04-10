@@ -103,7 +103,11 @@ module.exports = class OrderHelper {
 					body.totalPages = body.totalPages  + pagesPdf;
 					
 					// body['totalPages'] = pagesPdf;
-					body.totalCost  = body.totalCost  +  ((parseInt(totPages)) * (side_price+colorPrice+paperSize+paperQuality))+binding;
+
+					let cost =  ((parseInt(totPages)) * (side_price+colorPrice+paperSize+paperQuality))+binding;
+					
+					body.items[index]['cost'] = cost;
+					body.totalCost  = body.totalCost  + cost;
 					// let tot = parseInt(item.copies) *  ( )
 					// orders.totalCost = 100;
 					console.log(index,"orders.totalCost",totPages,side_price,colorPrice,paperQuality,paperSize);

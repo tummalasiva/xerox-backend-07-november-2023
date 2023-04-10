@@ -45,6 +45,10 @@ const orderSchema = new Schema({
         totalPages:{
             type: Number,
             required: true,
+        },
+        cost:{
+            type: Number,
+            required: true,
         }
     }],
     storeId: {
