@@ -106,7 +106,7 @@ module.exports = class OrderHelper {
 
 					let cost =  parseInt((parseInt(totPages)) * (side_price+colorPrice+paperSize+paperQuality))+binding;
 					
-					body.items[index]['cost'] = cost;
+					body.items[index]['cost'] = parseInt(cost);
 					body.totalCost  = body.totalCost  + parseInt(cost);
 					// let tot = parseInt(item.copies) *  ( )
 					// orders.totalCost = 100;
