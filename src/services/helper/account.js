@@ -62,8 +62,10 @@ module.exports = class AccountHelper {
 				})
 			}
 
+			console.log("email",email)
+
 			if (process.env.ENABLE_EMAIL_OTP_VERIFICATION === 'true') {
-				const redisData = await utilsHelper.redisGet(email)
+				const redisData = await utilsHelper.redisGet(bodyData.mobile)
 				if (!redisData || redisData.otp != bodyData.otp) {
 					return common.failureResponse({
 						message: 'OTP_INVALID',
@@ -368,7 +370,7 @@ module.exports = class AccountHelper {
 				isValidOtpExist = false
 			}
 
-			console.log("user.password",user.password);
+			// console.log("user.password",user.password);
 			const isPasswordCorrect = bcryptJs.compareSync(bodyData.password, user.password)
 			console.log("isPasswordCorrect",isPasswordCorrect);
 			if (isPasswordCorrect) {
@@ -400,23 +402,11 @@ module.exports = class AccountHelper {
 				}
 			}
 
-			const templateData = await notificationTemplateData.findOneEmailTemplate(
-				process.env.OTP_EMAIL_TEMPLATE_CODE
-			)
-
-			if (templateData) {
-				// Push otp to kafka
-				const payload = {
-					type: common.notificationEmailType,
-					email: {
-						to: bodyData.email,
-						subject: templateData.subject,
-						body: utilsHelper.composeEmailBody(templateData.body, { name: user.name, otp }),
-					},
-				}
-
-				await kafkaCommunication.pushEmailToKafka(payload)
-			}
+			let smsInfo2 = await notifications.sendSms({
+				"to": bodyData.mobile,
+				"message": utilsHelper.composeEmailBody(common.FORGOT_OTP, { name: bodyData.name, otp }),
+				"template_id":process.env.FORGOT_OTP_TEMPLATE_ID
+		   });
 
 			return common.successResponse({
 				statusCode: httpStatusCode.ok,
@@ -499,11 +489,7 @@ module.exports = class AccountHelper {
 		   });
 
 		   	
-			let smsInfo2 = await notifications.sendSms({
-				"to": bodyData.mobile,
-				"message": utilsHelper.composeEmailBody(common.FORGOT_OTP, { name: bodyData.name, otp }),
-				"template_id":process.env.FORGOT_OTP_TEMPLATE_ID
-		   });
+	
 
 			// if (process.env.APPLICATION_ENV === 'development') {
 				console.log(otp)

@@ -65,6 +65,9 @@ module.exports = {
   refreshTokenExpiryInMs:
     Number(process.env.REFRESH_TOKEN_EXPIRY) * 24 * 60 * 60 * 1000,
   otpExpirationTime: process.env.OTP_EXP_TIME, // In Seconds
-  SIGN_UP_OTP:"Dear customer, use this One Time Password {otp} to log in to your {name} account. This OTP will be valid for the next 15 mins.",
-  FORGOT_OTP:"Dear {name}, {otp} is OTP for your reset password and valid for next 15minutes, please do not share with anyone -webspruce"
+  SIGN_UP_OTP:"Dear {name}, Your One Time Password(OTP) {otp} is for registration . This OTP will be valid for the next 15 mins. - webspruce",
+  FORGOT_OTP:"Dear {name}, {otp} is OTP for your reset password and valid for next 15minutes, please do not share with anyone -webspruce",
+  ORDER_COMPLETE_MESSAGE: "Dear {name}, Your order {orderId} is ready kindly pickup the order from {address} - webspruce",
+  ORDER_REJECT_MESSAGE: "Dear {name}, Your order {orderId} got rejected, if any amount was deducted it will get refunded within 7 working days - webspruce",
+  ORDER_ACCEPT_MESSAGE: "Dear {name}, Store manager accepted your order and your order ID is {orderId} - webspruce"
 };

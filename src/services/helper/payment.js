@@ -10,9 +10,14 @@ const paymentData = require('@db/payment/queries')
 
 const orderData = require('@db/order/queries')
 
+const usersData = require('@db/users/queries')
 const Razorpay = require('razorpay');
+const ObjectId = require('mongoose').Types.ObjectId
+
+const storeData = require('@db/store/queries')
 
 var crypto = require("crypto");
+const notifications = require('../../generics/helpers/notifications')
 
 var instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -72,22 +77,31 @@ module.exports = class paymentHelper {
         .update(body.toString())
         .digest('hex');
 
-
-        
-
-
       var response = { "signatureIsValid": "false",statusCode:200 }
       if (expectedSignature === params.razorpay_signature){
         response = { "signatureIsValid": "true", statusCode:200, custom:true }
 
-        let paymentInfo = await paymentData.findOne({ paymentId: params.razorpay_payment_id });
+        let paymentInfo = await paymentData.findOne({ paymentId: params.razorpay_order_id });
 
-        let paymentUpdate = await paymentData.update({ paymentId: params.razorpay_payment_id },{ paidAt:new Date(), isPaid:true  });
-        
+        let paymentUpdate = await paymentData.update({ paymentId: params.razorpay_order_id },{ paidAt:new Date(), isPaid:true  });
+       
+        let orderInfo = await orderData.findOne({ _id: ObjectId(paymentInfo.orderId) });
+
         let  orderUpdate = await orderData.updateOneOrder({ _id: paymentInfo.orderId  },
           { paymentId:paymentInfo._id, paidAt:new Date(), isPaid:true,status:"paid" 
           });
-        console.log("-----------",paymentInfo.orderId );
+   
+        let userInfo = await usersData.findOne({ _id: paymentInfo.userId });
+
+        let storeInfo = await storeData.findOne({ _id: orderInfo.storeId });
+
+        let smsInfo2 = await notifications.sendSms({
+          "to": userInfo.mobile,
+          "message": utilsHelper.composeEmailBody(common.ORDER_COMPLETE_MESSAGE, { name: userInfo.name, orderId: paymentInfo.orderId,address: storeInfo.address }),
+          "template_id":process.env.ORDER_COMPLETE_TEMPLATE_ID
+         });
+
+        
 
 
       }

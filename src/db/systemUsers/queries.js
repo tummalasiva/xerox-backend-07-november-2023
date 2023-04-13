@@ -66,7 +66,8 @@ module.exports = class SystemUsersData {
 						updatedAt:1,
 						createdAt:1,
 						updatedBy:1,
-						createdBy:1
+						createdBy:1,
+						store:1
 					},
 				},
 				{

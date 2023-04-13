@@ -41,6 +41,8 @@ module.exports = class StoreHelper {
 			let stores = await storesData.create(body);		
 			if (stores && stores._id) {
 
+				 await systemUsersData.updateOneUser({ _id: ObjectId(userId)  },{ $push: { store:stores._id }  });
+
 				return common.successResponse({
 					statusCode: httpStatusCode.ok,
 					message: "Store created successfully",
@@ -79,7 +81,7 @@ module.exports = class StoreHelper {
 					_id: { $in: ids  }
 				}
 			}
-			console.log("filters",filters);
+			console.log("filters ------------------",filters);
 
 				let store = await storesData.listStores(
 					filters,
@@ -89,6 +91,7 @@ module.exports = class StoreHelper {
 				)
 				
 				if (store[0].data.length < 1) {
+
 					return common.successResponse({
 						statusCode: httpStatusCode.ok,
 						message: "Stores not found",
