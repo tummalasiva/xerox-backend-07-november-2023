@@ -86,9 +86,9 @@ module.exports = async function (req, res, next) {
 		/* Invalidate token when user role is updated, say from mentor to mentee or vice versa */
 		// const user = await UsersData.findOne({ _id: decodedToken.data._id })
 
-		// const roleInfo = await permissionData.findOne({ role:decodedToken.data.role });
+		const roleInfo = await permissionData.findOne({ role:decodedToken.data.role });
 
-		// req['roleInfo'] = roleInfo;
+		req['roleInfo'] = roleInfo;
 		// console.log(decodedToken.data,"--------------------------",roleInfo)
 
 		// if(req.path.has )
