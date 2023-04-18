@@ -16,6 +16,7 @@ module.exports = class SystemUsersData {
 
 	static async find(filter, projection = {}) {
 		try {
+			filter['superAdmin'] = false;
 			const userData = await SystemUsers.find(filter, projection).lean({
 				getters: true,
 			})
@@ -63,6 +64,7 @@ module.exports = class SystemUsersData {
 			let data = await SystemUsers.aggregate([
 				{
 					$match: {
+						superAdmin: false,
 						deleted: false,
 						$or: [{ name: new RegExp(search, 'i') }],
 					},
