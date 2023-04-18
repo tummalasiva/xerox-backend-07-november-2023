@@ -11,6 +11,9 @@ const paymentData = require('@db/payment/queries')
 const orderData = require('@db/order/queries')
 
 const usersData = require('@db/users/queries')
+
+const systemUsersData = require('@db/systemUsers/queries')
+
 const Razorpay = require('razorpay');
 const ObjectId = require('mongoose').Types.ObjectId
 
@@ -18,6 +21,9 @@ const storeData = require('@db/store/queries')
 
 var crypto = require("crypto");
 const notifications = require('../../generics/helpers/notifications')
+
+
+
 
 var instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -79,6 +85,8 @@ module.exports = class paymentHelper {
 
       var response = { "signatureIsValid": "false",statusCode:200 }
       if (expectedSignature === params.razorpay_signature){
+
+
         response = { "signatureIsValid": "true", statusCode:200, custom:true }
 
         let paymentInfo = await paymentData.findOne({ paymentId: params.razorpay_order_id });
@@ -101,6 +109,17 @@ module.exports = class paymentHelper {
           "template_id":process.env.ORDER_COMPLETE_TEMPLATE_ID
          });
 
+
+        let employees =  await systemUsersData.find({  store: orderInfo.storeId  },{ firebaseToken:1 });
+      
+        let tokens = [];
+        employees.forEach(element => {
+          if(element.firebaseToken){
+            tokens.push(element.firebaseToken);
+          }
+         
+        });
+         await sendPushNotification(tokens,"New Order", { orderId: orderInfo._id,price:paymentInfo.amount });
         
 
 
@@ -120,4 +139,5 @@ module.exports = class paymentHelper {
 
     }
   }
+
 }

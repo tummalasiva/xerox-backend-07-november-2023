@@ -21,7 +21,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+
+var admin = require("firebase-admin");
+var fcm = require('fcm-notification');
 // send email
+
+var serviceAccount = require("@configs/firebasekey.json");
+const certPath = admin.credential.cert(serviceAccount);
+var FCM = new fcm(certPath);
 
 
 
@@ -118,10 +125,36 @@ async function sendSms(params) {
 		}
 	}
 }
+async function sendPushNotification(fcm_token, title, body){
+
+    try{
+        let message = {
+            android: {
+                notification: {
+                    title: title,
+                    body: body,
+                },
+            }
+        };
+
+        FCM.sendToMultipleToken(message,fcm_token, function(err, resp) {
+            if(err){
+                throw err;
+            }else{
+                console.log('Successfully sent notification');
+            }
+        });
+
+    }catch(err){
+        throw err;
+        }
+
+    }
 
 
 
 module.exports = {
 	sendEmail: sendEmail,
-	sendSms: sendSms
+	sendSms: sendSms,
+	sendPushNotification:sendPushNotification
 }

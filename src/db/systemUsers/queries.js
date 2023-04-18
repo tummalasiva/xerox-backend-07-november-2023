@@ -14,6 +14,17 @@ module.exports = class SystemUsersData {
 		}
 	}
 
+	static async find(filter, projection = {}) {
+		try {
+			const userData = await SystemUsers.find(filter, projection).lean({
+				getters: true,
+			})
+			return userData
+		} catch (error) {
+			return error
+		}
+	}
+
 	static async findUsersByEmail(email) {
 		try {
 			const userData = await SystemUsers.findOne({ 'email.address': email }).lean()

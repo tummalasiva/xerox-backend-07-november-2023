@@ -15,6 +15,8 @@ module.exports = class StoresData {
 		}
 	}
 
+	
+
 	static async findAllStores(filter, projection = {}) {
 		try {
 			const StoresData = await Stores.find(filter, projection).lean({

@@ -24,6 +24,11 @@ const pdf =  require("page-count");
 
 var request = require('request-promise');
 
+const notifications = require('../../generics/helpers/notifications')
+
+const usersData = require('@db/users/queries');
+const { order } = require('./payment');
+
 
 module.exports = class OrderHelper {
 
@@ -202,25 +207,30 @@ static async update(id,body,userId) {
 	try {
 
 		
-		// let existDoc = await ordersData.findOne({  _id: { $ne: id } });
-
-		// if(existDoc){
-		// 	return common.failureResponse({
-		// 		message: 'Order already exist',
-		// 		statusCode: httpStatusCode.bad_request,
-		// 		responseCode: 'CLIENT_ERROR',
-		// 	})
-		// }
+		
 		body.updatedAt = new Date().getTime();
 		body.updatedBy = userId;
-		let orders = await ordersData.updateOneOrder({ _id: id },body);		
+		let orders = await ordersData.updateOneOrder({ _id: id },body);	
+		
+
+		if(body.status == "accepted"){
+
+			let userInfo = await usersData.findOne({ _id: userId });	
+
+			await notifications.sendSms({
+				"to": userInfo.mobile,
+				"message": utilsHelper.composeEmailBody(common.ORDER_ACCEPT_MESSAGE, { name: userInfo.name, orderId: id }),
+				"template_id":process.env.ORDER_ACCEPTED_TEMPLATE_ID
+			});
+	  
+
+		} else if(body.status == "rejected"){
+
+		}
 		if (orders) {
 
             let newOrders = await ordersData.findOne({  _id: id });
 
-            newOrders.totalCost = 100;
-            newOrders.totalPages = 1;
-            newOrders.costPerPage = 1;
 
 			return common.successResponse({
 				statusCode: httpStatusCode.ok,

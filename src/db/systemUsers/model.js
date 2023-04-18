@@ -52,7 +52,8 @@ const userSchema = new Schema({
         type: Boolean,
         default:false
     },
-	store:Array
+	store:Array,
+	firebaseToken:String
 
 })
 userSchema.plugin(mongooseLeanGetter)
