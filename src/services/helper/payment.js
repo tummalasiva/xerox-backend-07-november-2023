@@ -119,7 +119,7 @@ module.exports = class paymentHelper {
           }
          
         });
-         await sendPushNotification(tokens,"New Order", { orderId: orderInfo._id,price:paymentInfo.amount });
+         await notifications.sendPushNotification(tokens,"New Order", { orderId: orderInfo._id,price:paymentInfo.amount });
         
 
 
