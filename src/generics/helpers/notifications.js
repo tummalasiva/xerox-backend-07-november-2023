@@ -129,19 +129,17 @@ async function sendPushNotification(fcm_token, title, body){
 
     try{
         let message = {
-            android: {
                 notification: {
                     title: title,
                     body: body,
-                },
-            }
+                }
         };
 
         FCM.sendToMultipleToken(message,fcm_token, function(err, resp) {
             if(err){
                 throw err;
             }else{
-                console.log('Successfully sent notification');
+                console.log(resp,'Successfully sent notification');
             }
         });
 
