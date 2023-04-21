@@ -14,6 +14,18 @@ module.exports = class SystemUsersData {
 		}
 	}
 
+	static async findEmployees(filter, projection = {}) {
+		try {
+		
+			const userData = await SystemUsers.find(filter, projection).lean({
+				getters: true,
+			})
+			return userData
+		} catch (error) {
+			return error
+		}
+	}
+
 	static async find(filter, projection = {}) {
 		try {
 			filter['superAdmin'] = false;

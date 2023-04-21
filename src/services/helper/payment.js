@@ -110,7 +110,7 @@ module.exports = class paymentHelper {
          });
 
 
-        let employees =  await systemUsersData.find({  store: orderInfo.storeId  },{ firebaseToken:1 });
+        let employees =  await systemUsersData.findEmployees({  store: orderInfo.storeId.toString()  });
       
         let tokens = [];
         employees.forEach(element => {
