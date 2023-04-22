@@ -27,7 +27,8 @@ var request = require('request-promise');
 const notifications = require('../../generics/helpers/notifications')
 
 const usersData = require('@db/users/queries');
-const { order } = require('./payment');
+
+const orderid = require('order-id')('key');
 
 
 module.exports = class OrderHelper {
@@ -35,6 +36,8 @@ module.exports = class OrderHelper {
 
 	static async create(body,userId) {
 		try {
+
+			body['orderId'] = orderid.generate();
 
             body.userId = userId;
 			body.createdBy = userId;

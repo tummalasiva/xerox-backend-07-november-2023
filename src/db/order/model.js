@@ -10,6 +10,13 @@ const orderSchema = new Schema({
         type: ObjectID,
         required: true
     },
+    orderId: {
+        type: String,
+        required: true,
+        index: {
+            unique: true,
+        },
+    },
     items: [ {
         documents:{
             type:Array,
