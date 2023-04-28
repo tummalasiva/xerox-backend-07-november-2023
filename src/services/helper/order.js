@@ -286,6 +286,34 @@ static async delete(id,userId) {
 		throw error
 	}
 }
+static async details(id,userId) {
+	try {
+
+		let orders = await ordersData.findOne({ _id: id });		
+
+		if (orders) {
+
+			return common.successResponse({
+				statusCode: httpStatusCode.ok,
+				message: "Order fetched successfully",
+				result: orders,
+			})
+
+		}else {
+				return common.failureResponse({
+					message: 'Failed to find the order details',
+					statusCode: httpStatusCode.bad_request,
+					responseCode: 'CLIENT_ERROR',
+				})
+		} 
+		
+		
+	} catch (error) {
+		throw error
+	}
+}
+
+
 
 
 

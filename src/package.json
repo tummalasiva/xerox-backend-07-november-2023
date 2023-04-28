@@ -66,6 +66,7 @@
 		"mongoose-paginate-v2": "^1.4.2",
 		"mongoose-timestamp": "^0.6.0",
 		"nodemailer": "^6.9.1",
+		"order-id": "^2.1.2",
 		"p-each-series": "^2.1.0",
 		"page-count": "^0.0.2",
 		"pdf-page-counter": "^1.0.3",
