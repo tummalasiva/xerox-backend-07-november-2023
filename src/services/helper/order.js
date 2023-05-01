@@ -181,12 +181,35 @@ module.exports = class OrderHelper {
 				)
 				
 				if (order[0].data.length < 1) {
+
+					let totalAmount = 0;
+					let pages = 0;
+					let colorPages = 0;
+					let blackandwhite = 0;
+					await Promise.all(order[0].data.map(function(orderInfo){
+						totalAmount = totalAmount + orderInfo.totalCost;
+						pages = pages + orderInfo.totalPages;
+						await Promise.all(orderInfo.items.map(function(items){
+							if(items.color == "bw"){
+								blackandwhite = blackandwhite + orderInfo.totalPages;
+							} else {
+								colorPages = colorPages + orderInfo.totalPages;
+							}
+
+						}))
+
+					}));
+
 					return common.successResponse({
 						statusCode: httpStatusCode.ok,
 						message: "Orders not found",
 						result: {
 							data: [],
 							count: 0,
+							totalAmount :totalAmount,
+							pages: pages,
+							colorPages:colorPages,
+							blackandwhite:blackandwhite
 						},
 					})
 				}
