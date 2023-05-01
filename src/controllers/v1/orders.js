@@ -51,5 +51,14 @@ module.exports = class Account {
         return error;
       }
     }
+    async details(req) {
+      const _id = req.params.id
+      try {
+        const result = await orderHelper.details(_id,req.decodedToken._id);
+        return result;
+      } catch (error) {
+        return error;
+      }
+    }
 
 };
