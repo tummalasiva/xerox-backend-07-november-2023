@@ -186,10 +186,10 @@ module.exports = class OrderHelper {
 					let pages = 0;
 					let colorPages = 0;
 					let blackandwhite = 0;
-					await Promise.all(order[0].data.map(function(orderInfo){
+					await Promise.all(order[0].data.map(async function(orderInfo){
 						totalAmount = totalAmount + orderInfo.totalCost;
 						pages = pages + orderInfo.totalPages;
-						await Promise.all(orderInfo.items.map(function(items){
+						await Promise.all(orderInfo.items.map(async function(items){
 							if(items.color == "bw"){
 								blackandwhite = blackandwhite + orderInfo.totalPages;
 							} else {
