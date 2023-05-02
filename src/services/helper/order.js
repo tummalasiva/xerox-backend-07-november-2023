@@ -182,7 +182,20 @@ module.exports = class OrderHelper {
 				
 				if (order[0].data.length < 1) {
 
-					let totalAmount = 0;
+					
+
+					return common.successResponse({
+						statusCode: httpStatusCode.ok,
+						message: "Orders not found",
+						result: {
+							data: [],
+							count: 0
+							
+						},
+					})
+				}
+
+				let totalAmount = 0;
 					let pages = 0;
 					let colorPages = 0;
 					let blackandwhite = 0;
@@ -200,20 +213,6 @@ module.exports = class OrderHelper {
 
 					}));
 
-					return common.successResponse({
-						statusCode: httpStatusCode.ok,
-						message: "Orders not found",
-						result: {
-							data: [],
-							count: 0,
-							totalAmount :totalAmount,
-							pages: pages,
-							colorPages:colorPages,
-							blackandwhite:blackandwhite
-						},
-					})
-				}
-
 
 				return common.successResponse({
 					statusCode: httpStatusCode.ok,
@@ -221,7 +220,11 @@ module.exports = class OrderHelper {
 					result: {
 						data: order[0].data,
 						count: order[0].count,
-					},
+						totalAmount :totalAmount,
+						pages: pages,
+						colorPages:colorPages,
+						blackandwhite:blackandwhite
+					}
 				})
 			
 		} catch (error) {
