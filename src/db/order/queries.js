@@ -80,7 +80,8 @@ module.exports = class OrdersData {
 						createdBy:1,
 						items:1,
 						isPaid:1,
-						paidAt:1
+						paidAt:1,
+						orderId:1
 					},
 				},
 				{
