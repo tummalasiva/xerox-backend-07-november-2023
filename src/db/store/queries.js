@@ -60,7 +60,7 @@ module.exports = class StoresData {
 				{
 					$match: {
 						$and:[ filters ],
-						// $or: [{ name: new RegExp(search, 'i') }],
+						$or: [{ name: new RegExp(search, 'i') }],
 					},
 					
 				},

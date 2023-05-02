@@ -119,6 +119,7 @@ module.exports = class paymentHelper {
           }
          
         });
+        
          await notifications.sendPushNotification(tokens,"New Order", { orderId: orderInfo._id,price:paymentInfo.amount });
         
 

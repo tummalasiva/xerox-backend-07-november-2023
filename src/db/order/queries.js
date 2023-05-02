@@ -58,7 +58,7 @@ module.exports = class OrdersData {
 				{
 					$match: {
 					   $and:[ filters],
-						// $or: [{ name: new RegExp(search, 'i') }],
+						$or: [{ orderId: new RegExp(search, 'i') }],
 					},
 				},
 				{

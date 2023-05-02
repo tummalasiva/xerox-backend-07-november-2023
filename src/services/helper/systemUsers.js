@@ -5,6 +5,7 @@ const common = require('@constants/common')
 const systemUserData = require('@db/systemUsers/queries')
 
 const permissionData = require('@db/permission/queries')
+const ObjectId = require('mongoose').Types.ObjectId
 
 module.exports = class SystemUsersHelper {
 	/**
@@ -191,9 +192,14 @@ module.exports = class SystemUsersHelper {
 
     static async list(params) {
 		try {
-			
+
+				let userInfo = await systemUserData.findOne({ _id:ObjectId(params.decodedToken._id) });
+
+				userInfo.superAdmin 
+				
 				let users = await systemUserData.listUsers(
-					// params.query.type,
+					userInfo.superAdmin,
+					userInfo.store,
 					params.pageNo,
 					params.pageSize,
 					params.searchText
