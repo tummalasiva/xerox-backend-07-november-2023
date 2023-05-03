@@ -80,8 +80,14 @@ module.exports = class SystemUsersData {
 				$or: [{ name: new RegExp(search, 'i') }],
 			}
 			
-			if(superAdmin==false){
-				filter['store'] = { $in: store }
+			let storesArray = []; 
+			if(superAdmin==false && store ){
+
+				
+				store.map(function(st){
+					storesArray.push(st.toString())
+				});
+				filter['store'] = { $in: storesArray }
 			}
 
 			let data = await SystemUsers.aggregate([
