@@ -70,14 +70,14 @@ module.exports = class SystemUsersData {
 	}
 
 
-	static async listUsers(superAdmin, storeId,page, limit, search) {
+	static async listUsers(superAdmin, 	,page, limit, search) {
 		try {
 			
 			let filter =  {
 				superAdmin: false,
 				deleted: false,
 			
-				$or: [{ name: new RegExp(search, 'i') }],
+				// $or: [{ name: new RegExp(search, 'i') }],
 			}
 			
 			let storesArray = []; 
