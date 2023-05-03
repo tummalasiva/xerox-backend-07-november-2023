@@ -70,7 +70,7 @@ module.exports = class SystemUsersData {
 	}
 
 
-	static async listUsers(superAdmin, 	,page, limit, search) {
+	static async listUsers(superAdmin, storeId	,page, limit, search) {
 		try {
 			
 			let filter =  {
@@ -80,10 +80,10 @@ module.exports = class SystemUsersData {
 			}
 			
 			let storesArray = []; 
-			if(superAdmin==false && store ){
+			if(superAdmin==false && storeId ){
 
 				
-				store.map(function(st){
+				storeId.map(function(st){
 					storesArray.push(st.toString())
 				});
 				filter['store'] = { $in: storesArray }
