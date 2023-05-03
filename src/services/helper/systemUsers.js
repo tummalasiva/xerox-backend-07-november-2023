@@ -195,7 +195,7 @@ module.exports = class SystemUsersHelper {
 
 				let userInfo = await systemUserData.findOne({ _id:ObjectId(params.decodedToken._id) });
 
-				userInfo.superAdmin 
+				
 				
 				let users = await systemUserData.listUsers(
 					userInfo.superAdmin,
