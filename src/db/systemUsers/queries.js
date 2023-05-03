@@ -76,8 +76,7 @@ module.exports = class SystemUsersData {
 			let filter =  {
 				superAdmin: false,
 				deleted: false,
-			
-				// $or: [{ name: new RegExp(search, 'i') }],
+				$or: [{ name: new RegExp(search, 'i') }],
 			}
 			
 			let storesArray = []; 
