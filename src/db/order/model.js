@@ -96,7 +96,22 @@ const orderSchema = new Schema({
     },
     paymentId: {
         type:String
-    }
+    },
+    feedBack:{
+		rating:{
+			type:Number,
+			max:5,
+			required:[true,'Please provide rating'],
+		},
+		user:{
+			type:mongoose.Schema.Types.ObjectId,
+			ref:'users'
+		},
+		review:{
+			type:String,
+			trim:true,
+		}
+	}
 })
 orderSchema.plugin(mongooseLeanGetter)
 

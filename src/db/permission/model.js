@@ -1,5 +1,5 @@
 
-const { ObjectID } = require('bson')
+const { ObjectId } = require('bson')
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
@@ -26,11 +26,11 @@ const permissionsSchema = new Schema({
         default:false
     },
 	createdBy: {
-		type: ObjectID,
+		type: mongoose.Schema.Types.ObjectId,
 		required: true
 	},
 	updatedBy: {
-		type: ObjectID,
+		type: ObjectId,
 		required: false
 	}
 	

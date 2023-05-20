@@ -42,6 +42,15 @@ module.exports = class Account {
       const _id = req.params.id
       try {
         const result = await storeHelper.delete(_id,req.decodedToken._id);
+        return result;  
+      } catch (error) {
+        return error;
+      }
+    }
+
+    async addReview(req) {
+      try {
+        const result = await storeHelper.addReviewToStore(req)
         return result;
       } catch (error) {
         return error;

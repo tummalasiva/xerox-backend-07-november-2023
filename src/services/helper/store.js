@@ -16,6 +16,7 @@ const httpStatusCode = require('@generics/http-status')
 
 const common = require('@constants/common')
 const storesData = require('@db/store/queries')
+const orderData = require('@db/order/queries')
 
 const systemUsersData = require('@db/systemUsers/queries')
 
@@ -182,6 +183,19 @@ static async delete(id,userId) {
 		} 
 		
 		
+	} catch (error) {
+		throw error
+	}
+}
+static async addReviewToStore({body,params}) {
+	try {
+		// const orderUpdate = await orderData.
+		const result = await storesData.pushFeedBack(params.storeId,body);
+
+		return common.successResponse({
+			statusCode: httpStatusCode.ok,
+			message: "Review has been added",
+		})
 	} catch (error) {
 		throw error
 	}

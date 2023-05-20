@@ -222,7 +222,7 @@ module.exports = class OrderHelper {
 						count: order[0].count,
 						totalAmount :totalAmount,
 						pages: pages,
-						colorPages:colorPages,
+						colorPages:colorPages, 
 						blackandwhite:blackandwhite
 					}
 				})

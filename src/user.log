@@ -296,3 +296,57 @@
 { "timestamp": "2023-02-26T15:02:06.726Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
 { "timestamp": "2023-02-26T15:02:08.689Z","correlationId": "d62db444-b770-4ede-97a1-fef1cdf688af","logger": "user","level": "info", "message": "***User Service Request Log***","request" : {"requestType":"Request Type POST for /xerox/v1/store/create on Sun Feb 26 2023 20:32:08 GMT+0530 (India Standard Time) from PostmanRuntime/7.30.1","requestHeaders":{"x-auth-token":"bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Il9pZCI6IjYzZjc2ZjJlMmZlODMwZGQ0MzA0MGNhYSIsImVtYWlsIjoidGVzdDFAZ21haWwuY29tIiwibmFtZSI6InNoYWh1In0sImlhdCI6MTY3NzQyMzMyMywiZXhwIjoxNjc3NTA5NzIzfQ.R_sf_sG0NyjTn0sFd4vTcCUNGEhRNguYee1fqVgQHJk","content-type":"application/json","user-agent":"PostmanRuntime/7.30.1","accept":"*/*","postman-token":"3091df6c-47e3-45db-a467-5faa9cb8578e","host":"localhost:3001","accept-encoding":"gzip, deflate, br","connection":"keep-alive","content-length":"92"},"requestBody":{"name":"store4","address":"aaaa","location":{"x":-73.974,"y":40.764}}} }
 { "timestamp": "2023-02-26T15:02:09.003Z","correlationId": "d62db444-b770-4ede-97a1-fef1cdf688af","logger": "user","level": "info", "message": "Store not created Error: Store not created"}
+{ "timestamp": "2023-05-06T09:45:51.974Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-06T09:46:57.094Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-06T09:48:05.615Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-06T09:54:53.129Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-06T10:00:12.069Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-06T10:04:30.336Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Environment: development"}
+{ "timestamp": "2023-05-06T10:04:30.339Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Application is running on the port:3001"}
+{ "timestamp": "2023-05-06T10:04:59.850Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-06T10:06:43.646Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Environment: development"}
+{ "timestamp": "2023-05-06T10:06:43.651Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Application is running on the port:3001"}
+{ "timestamp": "2023-05-06T10:07:13.231Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T05:59:51.167Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Environment: development"}
+{ "timestamp": "2023-05-18T05:59:51.170Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Application is running on the port:3005"}
+{ "timestamp": "2023-05-18T06:34:16.977Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Environment: development"}
+{ "timestamp": "2023-05-18T06:34:16.981Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Application is running on the port:3005"}
+{ "timestamp": "2023-05-18T06:34:46.605Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T06:35:48.924Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T06:37:04.001Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T06:43:20.227Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T06:48:03.604Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T06:49:15.637Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:04:18.746Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:05:52.322Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:07:50.745Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:11:47.186Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:13:20.490Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:15:18.993Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:17:43.188Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:28:56.388Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:37:22.818Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:39:42.520Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:41:10.845Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T07:42:35.676Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T08:31:51.369Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T08:56:53.613Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T08:57:25.658Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T08:59:30.130Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T09:21:13.603Z","correlationId": "nocorrelation","logger": "user","level": "error", "message": "Database connection error:","triggerNotification": "true" }
+{ "timestamp": "2023-05-18T09:23:01.860Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:33:43.834Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:37:06.361Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:37:16.824Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:37:18.237Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:37:31.455Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Environment: development"}
+{ "timestamp": "2023-05-18T09:37:31.478Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:37:31.459Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Application is running on the port:3005"}
+{ "timestamp": "2023-05-18T09:37:33.545Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:38:57.456Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Environment: development"}
+{ "timestamp": "2023-05-18T09:38:57.481Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:38:57.461Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Application is running on the port:3005"}
+{ "timestamp": "2023-05-18T09:44:53.656Z","correlationId": "bd88367f-f75f-4d25-a82a-4ae8534d3c38","logger": "user","level": "info", "message": "***User Service Request Log***","request" : {"requestType":"Request Type POST for /xerox/v1/systemUsers/login on Thu May 18 2023 15:14:53 GMT+0530 (India Standard Time) from Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36","requestHeaders":{"host":"localhost:3005","connection":"keep-alive","content-length":"50","sec-ch-ua":"\"Google Chrome\";v=\"113\", \"Chromium\";v=\"113\", \"Not-A.Brand\";v=\"24\"","accept":"application/json, text/plain, */*","content-type":"application/json","sec-ch-ua-mobile":"?0","user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36","sec-ch-ua-platform":"\"Windows\"","origin":"http://localhost:3000","sec-fetch-site":"same-site","sec-fetch-mode":"cors","sec-fetch-dest":"empty","referer":"http://localhost:3000/","accept-encoding":"gzip, deflate, br","accept-language":"en-US,en;q=0.9"},"requestBody":{"email":"checker@gmail.com","password":"checker"}} }
+{ "timestamp": "2023-05-18T09:44:53.700Z","correlationId": "bd88367f-f75f-4d25-a82a-4ae8534d3c38","logger": "user","level": "info", "message": "req.validationErrors is not a function TypeError: req.validationErrors is not a function"}
+{ "timestamp": "2023-05-18T09:45:24.016Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}
+{ "timestamp": "2023-05-18T09:47:25.689Z","correlationId": "nocorrelation","logger": "user","level": "info", "message": "Connected to DB"}

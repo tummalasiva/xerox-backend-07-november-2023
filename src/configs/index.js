@@ -1,6 +1,6 @@
 require("./mongodb")();
 // require('./cache')()
-require("./redis")();
+// require("./redis")();
 
 require("./aes256cbc")();
 const path = require("path");

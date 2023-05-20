@@ -100,4 +100,17 @@ module.exports = class StoresData {
 			return error
 		}
 	}
+
+	static async pushFeedBack(storeId,feedBack) {
+		try {
+			const queryRes = await Stores.updateOne({_id:storeId},{
+				"$push":{
+					feedBack:feedBack
+				}
+			})
+			return queryRes;
+		} catch (error) {
+			return error
+		}
+	}
 }
