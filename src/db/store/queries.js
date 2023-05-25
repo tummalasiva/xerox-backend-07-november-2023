@@ -65,6 +65,13 @@ module.exports = class StoresData {
 					
 				},
 				{
+					$addFields:{
+						avgRating:{
+							$cond:{if:{$isArray:"$feedBack"}, then:{$divide:[{$sum:"$feedBack.rating"},{$size:"$feedBack"}]},else:0}
+						}
+					}
+				},
+				{
 					$project: {
 						name: 1,
 						address: 1,
@@ -73,8 +80,29 @@ module.exports = class StoresData {
 						updatedAt:1,
 						createdAt:1,
 						updatedBy:1,
-						createdBy:1
+						createdBy:1,
+						feedBack:1,
+						avgRating:1,
+						reviewers:1,
 					},
+				},
+				{
+					$lookup:{
+						from:"users",
+						let:{"refUserId":"$feedBack.user"},
+						pipeline:[{
+							$match:{
+								$expr:{
+									$in:["$_id",{$cond:{if:{$isArray:"$$refUserId"}, then:"$$refUserId",else:[]}}]
+								}
+							}
+						},{
+							$project:{
+								refreshTokens:0
+							}
+						}],
+						as:"reviewer"
+					}
 				},
 				{
 					$sort: { name: 1 },
@@ -94,10 +122,22 @@ module.exports = class StoresData {
 					},
 				},
 			]).collation({ locale: 'en', caseLevel: false })
-
+			console.log('check result ',data)
 			return data;
 		} catch (error) {
 			return error
 		}
 	}
+	static async pushFeedBack(storeId,feedBack) {
+		try {
+			const queryRes = await Stores.updateOne({_id:storeId},{
+				"$push":{
+					feedBack:feedBack
+				}
+			})
+			return queryRes;
+		} catch (error) {
+			return error
+		}
+	}	
 }

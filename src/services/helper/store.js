@@ -16,6 +16,7 @@ const httpStatusCode = require('@generics/http-status')
 
 const common = require('@constants/common')
 const storesData = require('@db/store/queries')
+const orderData = require('@db/order/queries')
 
 const systemUsersData = require('@db/systemUsers/queries')
 
@@ -89,7 +90,7 @@ module.exports = class StoreHelper {
 					params.pageSize,
 					params.searchText
 				)
-				
+				console.log(store);
 				if (store[0].data.length < 1) {
 
 					return common.successResponse({
@@ -182,6 +183,22 @@ static async delete(id,userId) {
 		} 
 		
 		
+	} catch (error) {
+		throw error
+	}
+}
+static async addReviewToStore(body,storeId,orderId) {
+	try {
+		const orderRes = await orderData.updateOneOrder({
+			_id:orderId
+		},{
+			feedBack:body
+		})
+		const result = await storesData.pushFeedBack(storeId,body);
+		return common.successResponse({
+			statusCode: httpStatusCode.ok,
+			message: "Review has been added",
+		})
 	} catch (error) {
 		throw error
 	}

@@ -159,6 +159,7 @@ module.exports = class AccountHelper {
 	 */
 
 	static async login(bodyData) {
+		console.log("account reach")
 		const projection = {
 			refreshTokens: 0,
 			'designation.deleted': 0,
