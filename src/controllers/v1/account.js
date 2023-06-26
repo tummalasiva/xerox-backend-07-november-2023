@@ -50,6 +50,7 @@ module.exports = class Account {
    */
 
   async login(req) {
+    console.log('controller reach');
     const params = req.body;
     try {
       const loggedInAccount = await accountHelper.login(params);

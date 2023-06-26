@@ -56,5 +56,15 @@ module.exports = class Account {
         return error;
       }
     }
+    async addReview(req) {
+      try {
+        const [storeId,orderId] = req.params.id.split(',');
+        req.body.user = req.decodedToken._id;
+        const result = await storeHelper.addReviewToStore(req.body,storeId,orderId);
+        return result;
+      } catch (error) {
+        return error;
+      }
+    }
 
 };
