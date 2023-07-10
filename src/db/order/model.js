@@ -1,120 +1,140 @@
+const { ObjectID } = require("bson");
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const { ObjectID } = require('bson')
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-
-const mongooseLeanGetter = require('mongoose-lean-getters')
+const mongooseLeanGetter = require("mongoose-lean-getters");
 
 const orderSchema = new Schema({
-    userId: {
-        type: ObjectID,
-        required: true
+  userId: {
+    type: ObjectID,
+    required: true,
+  },
+  orderId: {
+    type: String,
+    required: true,
+    index: {
+      unique: true,
     },
-    orderId: {
+  },
+  items: [
+    {
+      documents: {
+        type: Array,
+        required: false,
+      },
+      copies: {
+        type: Number,
+        required: true,
+      },
+      colors: [
+        {
+          color: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
+      blackAndWhite: {
+        fromPage: Number,
+        toPage: Number,
+        total: Number,
+      },
+
+      color: {
+        fromPage: Number,
+        toPage: Number,
+        total: Number,
+      },
+      totalPages: {
+        type: Number,
+        // required: true,
+      },
+      paperSize: {
         type: String,
         required: true,
-        index: {
-            unique: true,
-        },
-    },
-    items: [ {
-        documents:{
-            type:Array,
-            required: false
-        },
-        copies: {
-            type: Number,
-            required: true,
-        },
-        color: {
-            type: String,
-            required: true,
-        },
-        paperSize: {
-            type: String,
-            required: true,
-        },
-        paperQuality: {
-                type: String,
-                required: true, 
-        },
-        binding: {
-            type: String,
-            required: false,
-        },
-        instructions: {
-            type: String,
-            required: false,
-        },
-        costPerPage:{
-            type: String,
-        },
-        totalPages:{
-            type: Number,
-            required: true,
-        },
-        cost:{
-            type: String,
-            required: true,
-        }
-    }],
-    storeId: {
-        type: ObjectID,
-		required: true
-    },
-    totalPages: {
-        type: Number,
-        required: false
-    },
-    totalCost: {
-        type: Number,
-        required: false
-    },
-    status: {
+      },
+      paperQuality: {
+        type: String,
+        required: true,
+      },
+      binding: {
         type: String,
         required: false,
-        default: "Pending"
+      },
+      instructions: {
+        type: String,
+        required: false,
+      },
+      costPerPage: {
+        type: String,
+      },
+      totalPages: {
+        type: Number,
+        required: true,
+      },
+      cost: {
+        type: String,
+        required: true,
+      },
     },
-    deleted: {
-        type: Boolean,
-        default:false
+  ],
+  storeId: {
+    type: ObjectID,
+    required: true,
+  },
+  totalPages: {
+    type: Number,
+    required: false,
+  },
+  totalCost: {
+    type: Number,
+    required: false,
+  },
+  status: {
+    type: String,
+    required: false,
+    default: "Pending",
+  },
+  deleted: {
+    type: Boolean,
+    default: false,
+  },
+  createdBy: {
+    type: ObjectID,
+    required: true,
+  },
+  updatedBy: {
+    type: ObjectID,
+    required: false,
+  },
+  paidAt: {
+    type: Date,
+  },
+  isPaid: {
+    type: Boolean,
+    default: false,
+  },
+  paymentId: {
+    type: String,
+  },
+  feedBack: {
+    rating: {
+      type: Number,
+      max: 5,
+      //   required: [true, "Please provide rating"],
     },
-	createdBy: {
-		type: ObjectID,
-		required: true
-	},
-	updatedBy: {
-		type: ObjectID,
-		required: false
-	},
-    paidAt:{
-        type:Date
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
     },
-	isPaid: {
-        type: Boolean,
-        default:false
+    review: {
+      type: String,
+      trim: true,
     },
-    paymentId: {
-        type:String
-    },
-    feedBack:{
-		rating:{
-			type:Number,
-			max:5,
-			required:[true,'Please provide rating'],
-		},
-		user:{
-			type:mongoose.Schema.Types.ObjectId,
-			ref:'users'
-		},
-		review:{
-			type:String,
-			trim:true,
-		}
-	}
-})
-orderSchema.plugin(mongooseLeanGetter)
+  },
+});
+orderSchema.plugin(mongooseLeanGetter);
 
-const orders = db.model('orders', orderSchema)
+const orders = db.model("orders", orderSchema);
 
-module.exports = orders
+module.exports = orders;

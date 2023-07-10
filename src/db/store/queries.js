@@ -19,6 +19,7 @@ module.exports = class StoresData {
       const StoresData = await Stores.find(filter, projection).lean({
         getters: true,
       });
+      console.log(StoresData, "StoresData");
       return StoresData;
     } catch (error) {
       return error;
@@ -64,7 +65,21 @@ module.exports = class StoresData {
           $addFields: {
             avgRating: {
               $cond: {
-                if: { $isArray: "$feedBack" },
+                if: {
+                  $and: [
+                    {
+                      $isArray: "$feedBack",
+                    },
+                    {
+                      $gt: [
+                        {
+                          $size: "$feedBack",
+                        },
+                        0,
+                      ],
+                    },
+                  ],
+                },
                 then: {
                   $divide: [
                     { $sum: "$feedBack.rating" },

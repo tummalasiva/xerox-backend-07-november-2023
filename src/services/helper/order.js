@@ -7,340 +7,406 @@
 
 // Dependencies
 
-
-const utilsHelper = require('@generics/utils')
-const httpStatusCode = require('@generics/http-status')
+const utilsHelper = require("@generics/utils");
+const httpStatusCode = require("@generics/http-status");
 // const emailNotifications = require('@generics/helpers/email-notifications')
-const fs = require('fs');
-const common = require('@constants/common')
-const ordersData = require('@db/order/queries')
+const fs = require("fs");
+const common = require("@constants/common");
+const ordersData = require("@db/order/queries");
 
-const storeData = require('@db/store/queries')
-const ObjectId = require('mongoose').Types.ObjectId
+const storeData = require("@db/store/queries");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 // const pdf = require('pdf-page-counter');
 
-const pdf =  require("page-count");
+const pdf = require("page-count");
 
-var request = require('request-promise');
+var request = require("request-promise");
 
-const notifications = require('../../generics/helpers/notifications')
+const notifications = require("../../generics/helpers/notifications");
 
-const usersData = require('@db/users/queries');
+const usersData = require("@db/users/queries");
 
-const orderid = require('order-id')('key');
-
+const orderid = require("order-id")("key");
 
 module.exports = class OrderHelper {
+  static async create(body, userId) {
+    try {
+      body["orderId"] = orderid.generate();
 
+      body.userId = userId;
+      body.createdBy = userId;
+      body.updatedAt = new Date().toISOString();
+      body.createdAt = new Date().toISOString();
 
-	static async create(body,userId) {
-		try {
+      let storeDetails = await storeData.findOne({ _id: body.storeId });
 
-			body['orderId'] = orderid.generate();
+      body.totalCost = 0;
+      body.totalPages = 0;
 
-            body.userId = userId;
-			body.createdBy = userId;
-			body.updatedAt = new Date().toISOString();
-			body.createdAt = new Date().toISOString();
-		
-			let storeDetails = await storeData.findOne({ _id:body.storeId });
+      if (body && body.items.length > 0) {
+        await Promise.all(
+          body.items.map(async (item, index) => {
+            let side_price = 0;
+            if (item.side == "one") {
+              side_price = parseInt(storeDetails.meta["costOneSide"]);
+            } else {
+              side_price = parseInt(storeDetails.meta["costTwoSide"]);
+            }
 
-			body.totalCost = 0;
-			body.totalPages = 0;
+            body.items[index]["side"] = item.side;
 
-			if (body  && body.items.length > 0) {
+            let colorPrice = 0;
+            if (item.colors.color == "bw") {
+              colorPrice = parseInt(storeDetails.meta["costBlack"]);
+            } else {
+              colorPrice = parseInt(storeDetails.meta["costColor"]);
+            }
 
-				await Promise.all((body.items).map(async (item,index) => {
-	
-					let side_price  =0 
-					if(item.side == "one"){
-						side_price = parseInt(storeDetails.meta['costOneSide']);
-					} else {
-						side_price = parseInt(storeDetails.meta['costTwoSide']);
-					}
+            body.items[index]["color"] = item.color;
 
-					body.items[index]['side'] = item.side;
+            let paperSize = 0;
+            if (item.paperSize == "a4") {
+              paperSize = parseInt(storeDetails.meta["sizeA4"]);
+            } else {
+              paperSize = parseInt(storeDetails.meta["sizeA5"]);
+            }
 
-					let colorPrice = 0; 
-					if(item.color=="bw"){
-						colorPrice = parseInt(storeDetails.meta['costBlack']);
-					} else {
-						colorPrice = parseInt(storeDetails.meta['costColor']);
-					}
+            body.items[index]["paperSize"] = item.paperSize;
 
-					body.items[index]['color'] = item.color;
+            let paperQuality = 0;
+            if (item.paperQuality == "100gsm") {
+              paperQuality = parseInt(storeDetails.meta["quality100Gsm"]);
+            } else {
+              paperQuality = parseInt(storeDetails.meta["quality80gsm"]);
+            }
+            body.items[index]["paperQuality"] = item.paperQuality;
 
-					let paperSize = 0; 
-					if(item.paperSize=="a4"){
-						paperSize = parseInt(storeDetails.meta['sizeA4']);
-					} else {
-						paperSize = parseInt(storeDetails.meta['sizeA5']);
-					}
+            let binding = 0;
+            if (item.binding == "Spiral") {
+              binding = parseInt(storeDetails.meta["spiralBinding"]);
+            } else if (item.binding == "Staples") {
+              binding = parseInt(storeDetails.meta["staplesBinding"]);
+            }
+            body.items[index]["binding"] = item.binding;
 
-					body.items[index]['paperSize'] = item.paperSize;
+            let pdfPath = await utilsHelper.getDownloadableUrl(
+              item.documents[0]
+            );
+            let buffer = await request.get(pdfPath, { encoding: null });
+            let pagesPdf = await pdf.PdfCounter.count(buffer);
 
-					let paperQuality = 0; 
-					if(item.paperQuality=="100gsm"){
-						paperQuality = parseInt(storeDetails.meta['quality100Gsm']);
-					} else {
-						paperQuality = parseInt(storeDetails.meta['quality80gsm']);
-					}
-					body.items[index]['paperQuality'] = item.paperQuality;
+            body.items[index]["totalPages"] = pagesPdf;
+            // let data = await pdf(pdfPath);
+            let totPages = parseInt(item.copies) * pagesPdf;
 
+            body.totalPages = body.totalPages + pagesPdf;
 
-					let binding = 0; 
-					if(item.binding=="Spiral"){
-						binding = parseInt(storeDetails.meta['spiralBinding']);
-					} else  if(item.binding=="Staples"){
-						binding = parseInt(storeDetails.meta['staplesBinding']);
-					} 
-					body.items[index]['binding'] = item.binding;
+            // body['totalPages'] = pagesPdf;
 
-					
-					let pdfPath = await utilsHelper.getDownloadableUrl(item.documents[0])
-					let buffer = await request.get(pdfPath, { encoding: null }); 
-					let pagesPdf = await pdf.PdfCounter.count(buffer);
+            let cost =
+              parseInt(
+                parseInt(totPages) *
+                  (side_price + colorPrice + paperSize + paperQuality)
+              ) + binding;
 
+            body.items[index]["cost"] = parseInt(cost);
+            body.totalCost = body.totalCost + parseInt(cost);
+            // let tot = parseInt(item.copies) *  ( )
+            // orders.totalCost = 100;
+            console.log(
+              index,
+              "orders.totalCost",
+              totPages,
+              side_price,
+              colorPrice,
+              paperQuality,
+              paperSize
+            );
 
-					body.items[index]['totalPages'] = pagesPdf;
-					// let data = await pdf(pdfPath);
-					let totPages = parseInt(item.copies) * pagesPdf;
+            body["costPerPage"] = 1;
+          })
+        );
 
+        let orders = await ordersData.create(body);
 
-					body.totalPages = body.totalPages  + pagesPdf;
-					
-					// body['totalPages'] = pagesPdf;
+        return common.successResponse({
+          statusCode: httpStatusCode.ok,
+          message: "Order created successfully",
+          result: orders,
+        });
+      } else {
+        return common.failureResponse({
+          message: "Order not created",
+          statusCode: httpStatusCode.bad_request,
+          responseCode: "CLIENT_ERROR",
+        });
+      }
+    } catch (error) {
+      console.log("-----", error);
+      throw error;
+    }
+  }
 
-					let cost =  parseInt((parseInt(totPages)) * (side_price+colorPrice+paperSize+paperQuality))+binding;
-					
-					body.items[index]['cost'] = parseInt(cost);
-					body.totalCost  = body.totalCost  + parseInt(cost);
-					// let tot = parseInt(item.copies) *  ( )
-					// orders.totalCost = 100;
-					console.log(index,"orders.totalCost",totPages,side_price,colorPrice,paperQuality,paperSize);
-					
-					body['costPerPage'] = 1;
-		
-				}));
+  //   static async create(body, userId) {
+  //     try {
+  //       body.orderId = orderid.generate();
+  //       body.userId = userId;
+  //       body.createdBy = userId;
+  //       body.updatedAt = new Date().toISOString();
+  //       body.createdAt = new Date().toISOString();
 
-				let orders = await ordersData.create(body);		
+  //       let storeDetails = await storeData.findOne({ _id: body.storeId });
 
-			
+  //       body.totalCost = 0;
+  //       body.totalPages = 0;
 
-               
-				return common.successResponse({
-					statusCode: httpStatusCode.ok,
-					message: "Order created successfully",
-					result: orders,
-				})
+  //       if (body && body.items.length > 0) {
+  //         await Promise.all(
+  //           body.items.map(async (item, index) => {
+  //             let side_price = 0;
+  //             if (item.side === "one") {
+  //               side_price = parseInt(storeDetails.meta["costOneSide"]);
+  //             } else {
+  //               side_price = parseInt(storeDetails.meta["costTwoSide"]);
+  //             }
 
-			}else {
-					return common.failureResponse({
-						message: 'Order not created',
-						statusCode: httpStatusCode.bad_request,
-						responseCode: 'CLIENT_ERROR',
-					})
-			} 
-			
-			
-		} catch (error) {
-			console.log("-----",error);
-			throw error
-		}
-	}
+  //             body.items[index].side = item.side;
 
-    static async list(params,userId,role) {
-		try {
+  //             let colorPrice = 0;
+  //             if (item.colors.color === "bw") {
+  //               colorPrice = parseInt(storeDetails.meta["costBlack"]);
+  //             } else {
+  //               colorPrice = parseInt(storeDetails.meta["costColor"]);
+  //             }
 
-				let filters = { }
-				if(role=="customer"){
-					filters['userId'] = ObjectId(userId); 
-				}
-			
-				if(params.query.storeId){
-					 filters['storeId'] = ObjectId(params.query.storeId); 
-				}
+  //             body.items[index].color = item.color;
 
-				if(params.query.status){
-					filters['status'] = params.query.status; 
-			   }
+  //             let paperSize = 0;
+  //             if (item.paperSize === "a4") {
+  //               paperSize = parseInt(storeDetails.meta["sizeA4"]);
+  //             } else {
+  //               paperSize = parseInt(storeDetails.meta["sizeA5"]);
+  //             }
 
-				if(params.query.startDate && params.query.endDate){
-					filters['createdAt'] = {
-						$gte: new Date(params.query.startDate),
-						$lte: new Date(params.query.endDate),
-					}
-				}
-				let order = await ordersData.listOrders(
-					// params.query.type,
-                    filters,
-					params.pageNo,
-					params.pageSize,
-					params.searchText
-				)
-				
-				if (order[0].data.length < 1) {
+  //             body.items[index].paperSize = item.paperSize;
 
-					
+  //             let paperQuality = 0;
+  //             if (item.paperQuality === "100gsm") {
+  //               paperQuality = parseInt(storeDetails.meta["quality100Gsm"]);
+  //             } else {
+  //               paperQuality = parseInt(storeDetails.meta["quality80gsm"]);
+  //             }
+  //             body.items[index].paperQuality = item.paperQuality;
 
-					return common.successResponse({
-						statusCode: httpStatusCode.ok,
-						message: "Orders not found",
-						result: {
-							data: [],
-							count: 0
-							
-						},
-					})
-				}
+  //             let binding = 0;
+  //             if (item.binding === "Spiral") {
+  //               binding = parseInt(storeDetails.meta["spiralBinding"]);
+  //             } else if (item.binding === "Staples") {
+  //               binding = parseInt(storeDetails.meta["staplesBinding"]);
+  //             }
+  //             body.items[index].binding = item.binding;
 
-				let totalAmount = 0;
-					let pages = 0;
-					let colorPages = 0;
-					let blackandwhite = 0;
-					await Promise.all(order[0].data.map(async function(orderInfo){
-						totalAmount = totalAmount + orderInfo.totalCost;
-						pages = pages + orderInfo.totalPages;
-						await Promise.all(orderInfo.items.map(async function(items){
-							if(items.color == "bw"){
-								blackandwhite = blackandwhite + orderInfo.totalPages;
-							} else {
-								colorPages = colorPages + orderInfo.totalPages;
-							}
+  //             let pdfPath = await utilsHelper.getDownloadableUrl(item.documents);
+  //             let buffer = await request.get(pdfPath, { encoding: null });
+  //             let pagesPdf = await pdf.PdfCounter.count(buffer);
 
-						}))
+  //             body.items[index].totalPages = pagesPdf;
 
-					}));
+  //             let totPages = parseInt(item.copies) * pagesPdf;
 
+  //             body.totalPages += pagesPdf;
 
-				return common.successResponse({
-					statusCode: httpStatusCode.ok,
-					message: "Orders fetched successfully",
-					result: {
-						data: order[0].data,
-						count: order[0].count,
-						totalAmount :totalAmount,
-						pages: pages,
-						colorPages:colorPages, 
-						blackandwhite:blackandwhite
-					}
-				})
-			
-		} catch (error) {
-			throw error
-		}
-}
+  //             let cost =
+  //               parseInt(totPages) *
+  //                 (side_price + colorPrice + paperSize + paperQuality) +
+  //               binding;
 
-static async update(id,body,userId) {
-	try {
+  //             body.items[index].cost = parseInt(cost);
+  //             body.totalCost += parseInt(cost);
 
-		
-		
-		body.updatedAt = new Date().getTime();
-		body.updatedBy = userId;
-		let orders = await ordersData.updateOneOrder({ _id: id },body);	
-		
+  //             body.costPerPage = 1;
+  //           })
+  //         );
 
-		if(body.status == "accepted"){
+  //         let orders = await ordersData.create(body);
+  //         console.log(orders, "ordddddservice");
+  //         return common.successResponse({
+  //           statusCode: httpStatusCode.OK,
+  //           message: "Order created successfully",
+  //           result: orders,
+  //         });
+  //       } else {
+  //         return common.failureResponse({
+  //           message: "Order not created",
+  //           statusCode: httpStatusCode.BAD_REQUEST,
+  //           responseCode: "CLIENT_ERROR",
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.log("Error:", error);
+  //       throw error;
+  //     }
+  //   }
 
-			let userInfo = await usersData.findOne({ _id: userId });	
+  static async list(params, userId, role) {
+    try {
+      let filters = {};
+      if (role == "customer") {
+        filters["userId"] = ObjectId(userId);
+      }
 
-			await notifications.sendSms({
-				"to": userInfo.mobile,
-				"message": utilsHelper.composeEmailBody(common.ORDER_ACCEPT_MESSAGE, { name: userInfo.name, orderId: id }),
-				"template_id":process.env.ORDER_ACCEPTED_TEMPLATE_ID
-			});
-	  
+      if (params.query.storeId) {
+        filters["storeId"] = ObjectId(params.query.storeId);
+      }
 
-		} else if(body.status == "rejected"){
+      if (params.query.status) {
+        filters["status"] = params.query.status;
+      }
 
-		}
-		if (orders) {
+      if (params.query.startDate && params.query.endDate) {
+        filters["createdAt"] = {
+          $gte: new Date(params.query.startDate),
+          $lte: new Date(params.query.endDate),
+        };
+      }
+      let order = await ordersData.listOrders(
+        // params.query.type,
+        filters,
+        params.pageNo,
+        params.pageSize,
+        params.searchText
+      );
 
-            let newOrders = await ordersData.findOne({  _id: id });
+      if (order[0].data.length < 1) {
+        return common.successResponse({
+          statusCode: httpStatusCode.ok,
+          message: "Orders not found",
+          result: {
+            data: [],
+            count: 0,
+          },
+        });
+      }
 
+      let totalAmount = 0;
+      let pages = 0;
+      let colorPages = 0;
+      let blackandwhite = 0;
+      await Promise.all(
+        order[0].data.map(async function (orderInfo) {
+          totalAmount = totalAmount + orderInfo.totalCost;
+          pages = pages + orderInfo.totalPages;
+          await Promise.all(
+            orderInfo.items.map(async function (items) {
+              if (items.color == "bw") {
+                blackandwhite = blackandwhite + orderInfo.totalPages;
+              } else {
+                colorPages = colorPages + orderInfo.totalPages;
+              }
+            })
+          );
+        })
+      );
 
-			return common.successResponse({
-				statusCode: httpStatusCode.ok,
-				message: "Order updated successfully",
-				result: newOrders,
-			})
+      return common.successResponse({
+        statusCode: httpStatusCode.ok,
+        message: "Orders fetched successfully",
+        result: {
+          data: order[0].data,
+          count: order[0].count,
+          totalAmount: totalAmount,
+          pages: pages,
+          colorPages: colorPages,
+          blackandwhite: blackandwhite,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 
-		}else {
-				return common.failureResponse({
-					message: 'Failed to update order details',
-					statusCode: httpStatusCode.bad_request,
-					responseCode: 'CLIENT_ERROR',
-				})
-		} 
-		
-		
-	} catch (error) {
-		throw error
-	}
-}
-static async delete(id,userId) {
-	try {
+  static async update(id, body, userId) {
+    try {
+      body.updatedAt = new Date().getTime();
+      body.updatedBy = userId;
+      let orders = await ordersData.updateOneOrder({ _id: id }, body);
 
-		
-		
-		
-		let orders = await ordersData.updateOneOrder({ _id: id },{ deleted: true, 
-			updatedBy: userId, 
-			updatedAt: new Date().getTime()
-		 });		
+      if (body.status == "accepted") {
+        let userInfo = await usersData.findOne({ _id: userId });
 
-		if (orders) {
+        await notifications.sendSms({
+          to: userInfo.mobile,
+          message: utilsHelper.composeEmailBody(common.ORDER_ACCEPT_MESSAGE, {
+            name: userInfo.name,
+            orderId: id,
+          }),
+          template_id: process.env.ORDER_ACCEPTED_TEMPLATE_ID,
+        });
+      } else if (body.status == "rejected") {
+      }
+      if (orders) {
+        let newOrders = await ordersData.findOne({ _id: id });
 
-			return common.successResponse({
-				statusCode: httpStatusCode.ok,
-				message: "Order deleted successfully",
-				result: orders,
-			})
+        return common.successResponse({
+          statusCode: httpStatusCode.ok,
+          message: "Order updated successfully",
+          result: newOrders,
+        });
+      } else {
+        return common.failureResponse({
+          message: "Failed to update order details",
+          statusCode: httpStatusCode.bad_request,
+          responseCode: "CLIENT_ERROR",
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async delete(id, userId) {
+    try {
+      let orders = await ordersData.updateOneOrder(
+        { _id: id },
+        { deleted: true, updatedBy: userId, updatedAt: new Date().getTime() }
+      );
 
-		}else {
-				return common.failureResponse({
-					message: 'Failed to delete details',
-					statusCode: httpStatusCode.bad_request,
-					responseCode: 'CLIENT_ERROR',
-				})
-		} 
-		
-		
-	} catch (error) {
-		throw error
-	}
-}
-static async details(id,userId) {
-	try {
+      if (orders) {
+        return common.successResponse({
+          statusCode: httpStatusCode.ok,
+          message: "Order deleted successfully",
+          result: orders,
+        });
+      } else {
+        return common.failureResponse({
+          message: "Failed to delete details",
+          statusCode: httpStatusCode.bad_request,
+          responseCode: "CLIENT_ERROR",
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  static async details(id, userId) {
+    try {
+      let orders = await ordersData.findOne({ _id: id });
 
-		let orders = await ordersData.findOne({ _id: id });		
-
-		if (orders) {
-
-			return common.successResponse({
-				statusCode: httpStatusCode.ok,
-				message: "Order fetched successfully",
-				result: orders,
-			})
-
-		}else {
-				return common.failureResponse({
-					message: 'Failed to find the order details',
-					statusCode: httpStatusCode.bad_request,
-					responseCode: 'CLIENT_ERROR',
-				})
-		} 
-		
-		
-	} catch (error) {
-		throw error
-	}
-}
-
-
-
-
-
-}
+      if (orders) {
+        return common.successResponse({
+          statusCode: httpStatusCode.ok,
+          message: "Order fetched successfully",
+          result: orders,
+        });
+      } else {
+        return common.failureResponse({
+          message: "Failed to find the order details",
+          statusCode: httpStatusCode.bad_request,
+          responseCode: "CLIENT_ERROR",
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+};

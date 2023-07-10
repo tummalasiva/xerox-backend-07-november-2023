@@ -1,4 +1,3 @@
-
 // Dependencies
 const accountHelper = require("@services/helper/account");
 const csv = require("csvtojson");
@@ -22,7 +21,8 @@ module.exports = class Account {
 
   async create(req) {
     const params = req.body;
-    const isAMentor = params.isAMentor ? true : false;
+    const isAMentor = params.isAMentor ? true : true;
+
     try {
       if (isAMentor && req.body.secretCode != process.env.MENTOR_SECRET_CODE) {
         throw common.failureResponse({
@@ -31,7 +31,10 @@ module.exports = class Account {
           responseCode: "CLIENT_ERROR",
         });
       }
-      const createdAccount = await accountHelper.create(params);
+      const createdAccount = await accountHelper.create({
+        ...params,
+        isAMentor: true,
+      });
       return createdAccount;
     } catch (error) {
       return error;
@@ -50,7 +53,7 @@ module.exports = class Account {
    */
 
   async login(req) {
-    console.log('controller reach');
+    console.log("controller reach");
     const params = req.body;
     try {
       const loggedInAccount = await accountHelper.login(params);
