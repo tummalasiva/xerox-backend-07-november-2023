@@ -47,7 +47,7 @@ module.exports = {
     "xerox/v1/account/registrationOtp",
     "xerox/v1/account/resetPassword",
     "xerox/v1/systemUsers/create",
-    "xerox/v1/systemUsers/login",
+    //"xerox/v1/systemUsers/login",
     "xerox/v1/organisations/list",
     "xerox/v1/payment/confirm",
   ],

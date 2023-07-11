@@ -21,8 +21,7 @@ module.exports = class Account {
 
   async create(req) {
     const params = req.body;
-    const isAMentor = params.isAMentor ? true : true;
-
+    const isAMentor = params.isAMentor ? true : false;
     try {
       if (isAMentor && req.body.secretCode != process.env.MENTOR_SECRET_CODE) {
         throw common.failureResponse({
@@ -31,10 +30,7 @@ module.exports = class Account {
           responseCode: "CLIENT_ERROR",
         });
       }
-      const createdAccount = await accountHelper.create({
-        ...params,
-        isAMentor: true,
-      });
+      const createdAccount = await accountHelper.create(params);
       return createdAccount;
     } catch (error) {
       return error;

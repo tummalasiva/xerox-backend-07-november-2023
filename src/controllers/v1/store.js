@@ -7,11 +7,8 @@ const httpStatusCode = require("@generics/http-status");
 module.exports = class Account {
   async create(req) {
     const params = req.body;
-    console.log(req.body, "reqbodddddyyy");
-    console.log(req.decodedToken._id, "req.decodedToken._id");
     try {
       const result = await storeHelper.create(params, req.decodedToken._id);
-
       return result;
     } catch (error) {
       return error;
@@ -36,7 +33,6 @@ module.exports = class Account {
   async list(req) {
     try {
       const result = await storeHelper.list(req);
-      console.log("resssssssssssult", result);
       return result;
     } catch (error) {
       return error;
