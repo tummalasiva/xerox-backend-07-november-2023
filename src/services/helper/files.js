@@ -40,7 +40,6 @@ module.exports = class FilesHelper {
       } else if (process.env.CLOUD_STORAGE === "OCI") {
         response = await cloudServices.getOciSignedUrl(destFilePath);
       }
-      console.log(response, "response");
       response.destFilePath = destFilePath;
       return common.successResponse({
         message: "SIGNED_URL_GENERATED_SUCCESSFULLY",

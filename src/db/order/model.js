@@ -34,15 +34,24 @@ const orderSchema = new Schema({
           },
         },
       ],
-      blackAndWhite: {
-        fromPage: Number,
-        toPage: Number,
+      bondPage: {
+        selected: {
+          type: Boolean,
+          default: false,
+        },
+        description: {
+          type: String,
+          required: function () {
+            return this.bondPage.description === true ? true : false;
+          },
+        },
         total: Number,
       },
 
-      color: {
-        fromPage: Number,
-        toPage: Number,
+      colorPar: {
+        description: {
+          type: String,
+        },
         total: Number,
       },
       totalPages: {
@@ -54,6 +63,10 @@ const orderSchema = new Schema({
         required: true,
       },
       paperQuality: {
+        type: String,
+        required: true,
+      },
+      printLayout: {
         type: String,
         required: true,
       },

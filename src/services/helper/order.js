@@ -30,10 +30,293 @@ const usersData = require("@db/users/queries");
 const orderid = require("order-id")("key");
 
 module.exports = class OrderHelper {
+  // static async create(body, userId) {
+  //   try {
+  //     body["orderId"] = orderid.generate();
+
+  //     body.userId = userId;
+  //     body.createdBy = userId;
+  //     body.updatedAt = new Date().toISOString();
+  //     body.createdAt = new Date().toISOString();
+
+  //     let storeDetails = await storeData.findOne({ _id: body.storeId });
+
+  //     body.totalCost = 0;
+  //     body.totalPages = 0;
+
+  //     if (body && body.items.length > 0) {
+  //       await Promise.all(
+  //         body.items.map(async (item, index) => {
+  //           let side_price = 0;
+  //           if (item.side == "one") {
+  //             side_price = parseInt(storeDetails.meta["costOneSide"]);
+  //           } else {
+  //             side_price = parseInt(storeDetails.meta["costTwoSide"]);
+  //           }
+
+  //           body.items[index]["side"] = item.side;
+
+  //           let colorPrice = 0;
+  //           if (item.colors.color == "bw") {
+  //             colorPrice = parseInt(storeDetails.meta["costBlack"]);
+  //           } else {
+  //             colorPrice = parseInt(storeDetails.meta["costColor"]);
+  //           }
+
+  //           body.items[index]["color"] = item.color;
+
+  //           let paperSize = 0;
+  //           if (item.paperSize == "a4") {
+  //             paperSize = parseInt(storeDetails.meta["sizeA4"]);
+  //           } else {
+  //             paperSize = parseInt(storeDetails.meta["sizeA5"]);
+  //           }
+
+  //           body.items[index]["paperSize"] = item.paperSize;
+
+  //           let paperQuality = 0;
+  //           if (item.paperQuality == "100gsm") {
+  //             paperQuality = parseInt(storeDetails.meta["quality100Gsm"]);
+  //           } else {
+  //             paperQuality = parseInt(storeDetails.meta["quality80gsm"]);
+  //           }
+  //           body.items[index]["paperQuality"] = item.paperQuality;
+
+  //           let binding = 0;
+  //           if (item.binding == "Spiral") {
+  //             binding = parseInt(storeDetails.meta["spiralBinding"]);
+  //           } else if (item.binding == "Staples") {
+  //             binding = parseInt(storeDetails.meta["staplesBinding"]);
+  //           } else if (item.binding == "StickFile") {
+  //             binding = parseInt(storeDetails.meta["stickFile"]);
+  //           }
+  //           body.items[index]["binding"] = item.binding;
+
+  //           let pdfPath = await utilsHelper.getDownloadableUrl(
+  //             item.documents[0]
+  //           );
+  //           let buffer = await request.get(pdfPath, { encoding: null });
+  //           let pagesPdf = await pdf.PdfCounter.count(buffer);
+
+  //           body.items[index]["totalPages"] = pagesPdf;
+  //           // let data = await pdf(pdfPath);
+  //           let totPages = parseInt(item.copies) * pagesPdf;
+
+  //           body.totalPages = body.totalPages + pagesPdf;
+
+  //           // body['totalPages'] = pagesPdf;
+
+  //           let cost =
+  //             parseInt(parseInt(totPages)) +
+  //             (side_price + colorPrice + paperSize + paperQuality + binding);
+
+  //           body.items[index]["cost"] = parseInt(cost);
+  //           body.totalCost = body.totalCost + parseInt(cost);
+  //           // let tot = parseInt(item.copies) *  ( )
+  //           // orders.totalCost = 100;
+  //           console.log(
+  //             index,
+  //             "orders.totalCost",
+  //             totPages,
+  //             side_price,
+  //             colorPrice,
+  //             paperQuality,
+  //             paperSize
+  //           );
+
+  //           body["costPerPage"] = 1;
+  //         })
+  //       );
+
+  //       let orders = await ordersData.create(body);
+
+  //       return common.successResponse({
+  //         statusCode: httpStatusCode.ok,
+  //         message: "Order created successfully",
+  //         result: orders,
+  //       });
+  //     } else {
+  //       return common.failureResponse({
+  //         message: "Order not created",
+  //         statusCode: httpStatusCode.bad_request,
+  //         responseCode: "CLIENT_ERROR",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log("-----", error);
+  //     throw error;
+  //   }
+  // }
+  // static async create(body, userId) {
+  //   try {
+  //     body["orderId"] = orderid.generate();
+  //     body.userId = userId;
+  //     body.createdBy = userId;
+  //     body.updatedAt = new Date().toISOString();
+  //     body.createdAt = new Date().toISOString();
+
+  //     let storeDetails = await storeData.findOne({ _id: body.storeId });
+
+  //     body.totalCost = 0;
+  //     body.totalPages = 0;
+
+  //     if (body && body.items.length > 0) {
+  //       await Promise.all(
+  //         body.items.map(async (item, index) => {
+  //           let totalColorPages = 0;
+  //           let totalBlackPages = 0;
+
+  //           console.log(item, "itemmmmmmmmmmmmmmmmmmmmm");
+  //           // sides
+  //           let side_price = 0;
+  //           if (item.sides === "one") {
+  //             side_price = parseInt(storeDetails.meta["costOneSide"]);
+  //           } else {
+  //             side_price = parseInt(storeDetails.meta["costTwoSide"]);
+  //           }
+
+  //           // bond
+  //           let bond_price = 0;
+  //           if (item.bondPage.selected === "yes") {
+  //             bond_price = parseInt(storeDetails.meta["bondPage"]) || 0;
+  //           }
+
+  //           body.items[index]["bondPage"] = item.bondPage.total;
+
+  //           body.items[index]["side"] = item.sides;
+
+  //           // color price
+  //           let colorPrice = 0;
+  //           let blackPrice = 0;
+  //           if (item.colors.color === "bw") {
+  //             totalBlackPages = item.totalPages;
+  //             totalColorPages = 0;
+  //             blackPrice = parseInt(storeDetails.meta["costBlack"]);
+  //             colorPrice = 0;
+  //           } else if (item.colors.color === "multi") {
+  //             totalColorPages = item.totalPages;
+  //             totalBlackPages = 0;
+  //             colorPrice = parseInt(storeDetails.meta["costColor"]);
+  //             blackPrice = 0;
+  //           } else {
+  //             totalBlackPages = item.totalPages - item.colorPar.total;
+  //             totalColorPages = item.colorPar.total;
+  //             colorPrice = parseInt(storeDetails.meta["costColor"]);
+  //             blackPrice = parseInt(storeDetails.meta["costColor"]);
+  //           }
+
+  //           body.items[index]["color"] = item.colors.color;
+  //           body.items[index]["totalColorPages"] = totalColorPages; // Add totalColorPages to the item object
+  //           body.items[index]["totalBlackPages"] = totalBlackPages; // Add totalBlackPages to the item object
+
+  //           let paperSize = 0;
+  //           if (item.paperSize === "a4") {
+  //             paperSize = parseInt(storeDetails.meta["sizeA4"]);
+  //           } else if (item.paperSize === "a5") {
+  //             paperSize = parseInt(storeDetails.meta["sizeA5"]);
+  //           } else if (item.paperSize === "legal") {
+  //             paperSize = parseInt(storeDetails.meta["legal"]);
+  //           } else if (item.paperSize === "letter") {
+  //             paperSize = parseInt(storeDetails.meta["letter"]);
+  //           } else if (item.paperSize === "b5") {
+  //             paperSize = parseInt(storeDetails.meta["sizeB5"]);
+  //           } else if (item.paperSize === "a6") {
+  //             paperSize = parseInt(storeDetails.meta["sizeA6"]);
+  //           } else if (item.paperSize === "postCard") {
+  //             paperSize = parseInt(storeDetails.meta["postCard"]);
+  //           } else if (item.paperSize === "5*7") {
+  //             paperSize = parseInt(storeDetails.meta["size5X7"]);
+  //           } else if (item.paperSize === "4*6") {
+  //             paperSize = parseInt(storeDetails.meta["size4X6"]);
+  //           } else {
+  //             paperSize = parseInt(storeDetails.meta["size35X5"]);
+  //           }
+
+  //           body.items[index]["paperSize"] = item.paperSize;
+  //           body.items[index]["printLayout"] = item.printLayout;
+
+  //           let paperQuality = 0;
+  //           if (item.paperQuality === "100gsm") {
+  //             paperQuality = parseInt(storeDetails.meta["quality100Gsm"]);
+  //           } else {
+  //             paperQuality = parseInt(storeDetails.meta["quality80gsm"]);
+  //           }
+  //           body.items[index]["paperQuality"] = item.paperQuality;
+
+  //           let binding = 0;
+  //           if (item.binding === "Spiral") {
+  //             binding = parseInt(storeDetails.meta["spiralBinding"]);
+  //           } else if (item.binding === "Staples") {
+  //             binding = parseInt(storeDetails.meta["staplesBinding"]);
+  //           } else if (item.binding === "StickFile") {
+  //             binding = parseInt(storeDetails.meta["stickFile"]);
+  //           }
+  //           body.items[index]["binding"] = item.binding;
+
+  //           let pdfPath = await utilsHelper.getDownloadableUrl(
+  //             item.documents[0]
+  //           );
+  //           let buffer = await request.get(pdfPath, { encoding: null });
+  //           let pagesPdf = await pdf.PdfCounter.count(buffer);
+
+  //           body.items[index]["totalPages"] = pagesPdf;
+
+  //           let cost = 0;
+
+  //           // Calculate cost for each factor
+  //           const copies = parseInt(item.copies);
+  //           const totalCostPerPageColor =
+  //             side_price +
+  //             colorPrice +
+  //             paperSize +
+  //             paperQuality +
+  //             binding +
+  //             bond_price;
+
+  //           const totalCostPerPageBlack =
+  //             side_price +
+  //             blackPrice +
+  //             paperSize +
+  //             paperQuality +
+  //             binding +
+  //             bond_price;
+
+  //           const totalCost =
+  //             copies *
+  //             (totalCostPerPageBlack * totalBlackPages +
+  //               totalCostPerPageColor * totalColorPages);
+
+  //           cost += totalCost;
+
+  //           body.items[index]["cost"] = parseInt(cost);
+  //           body.totalCost += parseInt(cost);
+  //           body.totalPages += pagesPdf;
+  //         })
+  //       );
+
+  //       let orders = await ordersData.create(body);
+
+  //       return common.successResponse({
+  //         statusCode: httpStatusCode.ok,
+  //         message: "Order created successfully",
+  //         result: orders,
+  //       });
+  //     } else {
+  //       return common.failureResponse({
+  //         message: "Order not created",
+  //         statusCode: httpStatusCode.bad_request,
+  //         responseCode: "CLIENT_ERROR",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log("-----", error);
+  //     throw error;
+  //   }
+  // }
+
   static async create(body, userId) {
     try {
       body["orderId"] = orderid.generate();
-
       body.userId = userId;
       body.createdBy = userId;
       body.updatedAt = new Date().toISOString();
@@ -47,32 +330,96 @@ module.exports = class OrderHelper {
       if (body && body.items.length > 0) {
         await Promise.all(
           body.items.map(async (item, index) => {
+            let pdfPath = await utilsHelper.getDownloadableUrl(
+              item.documents[0]
+            );
+            let buffer = await request.get(pdfPath, { encoding: null });
+            let pagesPdf = await pdf.PdfCounter.count(buffer);
+
+            item.totalPages = pagesPdf;
+
+            let totalColorPages = 0;
+            let totalBlackPages = 0;
+
+            console.log(body.items[index], "body=====================");
+
+            // sides
             let side_price = 0;
-            if (item.side == "one") {
+            if (item.sides == "one") {
               side_price = parseInt(storeDetails.meta["costOneSide"]);
             } else {
               side_price = parseInt(storeDetails.meta["costTwoSide"]);
             }
 
-            body.items[index]["side"] = item.side;
-
-            let colorPrice = 0;
-            if (item.colors.color == "bw") {
-              colorPrice = parseInt(storeDetails.meta["costBlack"]);
-            } else {
-              colorPrice = parseInt(storeDetails.meta["costColor"]);
+            // bond
+            let bond_price = 0;
+            if (item.bondPage.selected === "yes") {
+              bond_price = parseInt(storeDetails.meta["bondPage"]) || 0;
             }
 
-            body.items[index]["color"] = item.color;
+            body.items[index]["bondPage"] = {
+              selected: item.bondPage.selected === "yes" ? true : false,
+              description: item.bondPage.description,
+              total: item.bondPage.total,
+            };
+
+            body.items[index]["side"] = item.sides;
+
+            // color price
+            let colorPrice = 0;
+            let blackPrice = 0;
+            if (item.colors.color == "bw") {
+              totalBlackPages = item.totalPages;
+              totalColorPages = 0;
+              blackPrice = parseInt(storeDetails.meta["costBlack"]);
+              colorPrice = 0;
+            } else if (item.colors.color == "multi") {
+              totalColorPages = item.totalPages;
+              totalBlackPages = 0;
+              colorPrice = parseInt(storeDetails.meta["costColor"]);
+              blackPrice = 0;
+            } else {
+              totalBlackPages = item.totalPages - item.colorPar.total;
+              totalColorPages = item.colorPar.total;
+              colorPrice = parseInt(storeDetails.meta["costColor"]);
+              blackPrice = parseInt(storeDetails.meta["costColor"]);
+            }
+
+            body.items[index]["color"] = item.colors.color;
+
+            if (item.colors.color === "colorPar") {
+              body.items[index]["colorPar"] = {
+                description: item.colorPar.description,
+                total: item.colorPar.total,
+              };
+            }
 
             let paperSize = 0;
             if (item.paperSize == "a4") {
               paperSize = parseInt(storeDetails.meta["sizeA4"]);
-            } else {
+            } else if (item.paperSize == "a5") {
               paperSize = parseInt(storeDetails.meta["sizeA5"]);
+            } else if (item.paperSize == "legal") {
+              paperSize = parseInt(storeDetails.meta["legal"]);
+            } else if (item.paperSize == "letter") {
+              paperSize = parseInt(storeDetails.meta["letter"]);
+            } else if (item.paperSize == "b5") {
+              paperSize = parseInt(storeDetails.meta["sizeB5"]);
+            } else if (item.paperSize == "a6") {
+              paperSize = parseInt(storeDetails.meta["sizeA6"]);
+            } else if (item.paperSize == "postCard") {
+              paperSize = parseInt(storeDetails.meta["postCard"]);
+            } else if (item.paperSize == "5*7") {
+              paperSize = parseInt(storeDetails.meta["size5X7"]);
+            } else if (item.paperSize == "4*6") {
+              paperSize = parseInt(storeDetails.meta["size4X6"]);
+            } else item.paperSize == "3.5*5";
+            {
+              paperSize = parseInt(storeDetails.meta["size35X5"]);
             }
 
             body.items[index]["paperSize"] = item.paperSize;
+            body.items[index]["printLayout"] = item.printLayout;
 
             let paperQuality = 0;
             if (item.paperQuality == "100gsm") {
@@ -87,44 +434,51 @@ module.exports = class OrderHelper {
               binding = parseInt(storeDetails.meta["spiralBinding"]);
             } else if (item.binding == "Staples") {
               binding = parseInt(storeDetails.meta["staplesBinding"]);
+            } else if (item.binding == "StickFile") {
+              binding = parseInt(storeDetails.meta["stickFile"]);
             }
             body.items[index]["binding"] = item.binding;
 
-            let pdfPath = await utilsHelper.getDownloadableUrl(
-              item.documents[0]
-            );
-            let buffer = await request.get(pdfPath, { encoding: null });
-            let pagesPdf = await pdf.PdfCounter.count(buffer);
-
             body.items[index]["totalPages"] = pagesPdf;
-            // let data = await pdf(pdfPath);
-            let totPages = parseInt(item.copies) * pagesPdf;
 
-            body.totalPages = body.totalPages + pagesPdf;
+            let cost = 0;
 
-            // body['totalPages'] = pagesPdf;
+            // Calculate cost for each factor
+            const copies = parseInt(item.copies);
+            const totalCostPerPageColor =
+              side_price +
+              colorPrice +
+              paperSize +
+              paperQuality +
+              binding +
+              bond_price;
 
-            let cost =
-              parseInt(
-                parseInt(totPages) *
-                  (side_price + colorPrice + paperSize + paperQuality)
-              ) + binding;
+            const totalCostPerPageBlack =
+              side_price +
+              blackPrice +
+              paperSize +
+              paperQuality +
+              binding +
+              bond_price;
+
+            // console.log(side_price, "sc");
+            // console.log(blackPrice, "bp");
+            // console.log(colorPrice, "cp");
+            // console.log(paperSize, "szec");
+            // console.log(paperQuality, "qc");
+            // console.log(binding, "bdc");
+            // console.log(bond_price, "bdgc");
+
+            const totalCost =
+              copies *
+              (totalCostPerPageBlack * totalBlackPages +
+                totalCostPerPageColor * totalColorPages);
+
+            cost += totalCost;
 
             body.items[index]["cost"] = parseInt(cost);
-            body.totalCost = body.totalCost + parseInt(cost);
-            // let tot = parseInt(item.copies) *  ( )
-            // orders.totalCost = 100;
-            console.log(
-              index,
-              "orders.totalCost",
-              totPages,
-              side_price,
-              colorPrice,
-              paperQuality,
-              paperSize
-            );
-
-            body["costPerPage"] = 1;
+            body.totalCost += parseInt(cost);
+            body.totalPages += pagesPdf;
           })
         );
 
@@ -147,107 +501,6 @@ module.exports = class OrderHelper {
       throw error;
     }
   }
-
-  //   static async create(body, userId) {
-  //     try {
-  //       body.orderId = orderid.generate();
-  //       body.userId = userId;
-  //       body.createdBy = userId;
-  //       body.updatedAt = new Date().toISOString();
-  //       body.createdAt = new Date().toISOString();
-
-  //       let storeDetails = await storeData.findOne({ _id: body.storeId });
-
-  //       body.totalCost = 0;
-  //       body.totalPages = 0;
-
-  //       if (body && body.items.length > 0) {
-  //         await Promise.all(
-  //           body.items.map(async (item, index) => {
-  //             let side_price = 0;
-  //             if (item.side === "one") {
-  //               side_price = parseInt(storeDetails.meta["costOneSide"]);
-  //             } else {
-  //               side_price = parseInt(storeDetails.meta["costTwoSide"]);
-  //             }
-
-  //             body.items[index].side = item.side;
-
-  //             let colorPrice = 0;
-  //             if (item.colors.color === "bw") {
-  //               colorPrice = parseInt(storeDetails.meta["costBlack"]);
-  //             } else {
-  //               colorPrice = parseInt(storeDetails.meta["costColor"]);
-  //             }
-
-  //             body.items[index].color = item.color;
-
-  //             let paperSize = 0;
-  //             if (item.paperSize === "a4") {
-  //               paperSize = parseInt(storeDetails.meta["sizeA4"]);
-  //             } else {
-  //               paperSize = parseInt(storeDetails.meta["sizeA5"]);
-  //             }
-
-  //             body.items[index].paperSize = item.paperSize;
-
-  //             let paperQuality = 0;
-  //             if (item.paperQuality === "100gsm") {
-  //               paperQuality = parseInt(storeDetails.meta["quality100Gsm"]);
-  //             } else {
-  //               paperQuality = parseInt(storeDetails.meta["quality80gsm"]);
-  //             }
-  //             body.items[index].paperQuality = item.paperQuality;
-
-  //             let binding = 0;
-  //             if (item.binding === "Spiral") {
-  //               binding = parseInt(storeDetails.meta["spiralBinding"]);
-  //             } else if (item.binding === "Staples") {
-  //               binding = parseInt(storeDetails.meta["staplesBinding"]);
-  //             }
-  //             body.items[index].binding = item.binding;
-
-  //             let pdfPath = await utilsHelper.getDownloadableUrl(item.documents);
-  //             let buffer = await request.get(pdfPath, { encoding: null });
-  //             let pagesPdf = await pdf.PdfCounter.count(buffer);
-
-  //             body.items[index].totalPages = pagesPdf;
-
-  //             let totPages = parseInt(item.copies) * pagesPdf;
-
-  //             body.totalPages += pagesPdf;
-
-  //             let cost =
-  //               parseInt(totPages) *
-  //                 (side_price + colorPrice + paperSize + paperQuality) +
-  //               binding;
-
-  //             body.items[index].cost = parseInt(cost);
-  //             body.totalCost += parseInt(cost);
-
-  //             body.costPerPage = 1;
-  //           })
-  //         );
-
-  //         let orders = await ordersData.create(body);
-  //         console.log(orders, "ordddddservice");
-  //         return common.successResponse({
-  //           statusCode: httpStatusCode.OK,
-  //           message: "Order created successfully",
-  //           result: orders,
-  //         });
-  //       } else {
-  //         return common.failureResponse({
-  //           message: "Order not created",
-  //           statusCode: httpStatusCode.BAD_REQUEST,
-  //           responseCode: "CLIENT_ERROR",
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.log("Error:", error);
-  //       throw error;
-  //     }
-  //   }
 
   static async list(params, userId, role) {
     try {

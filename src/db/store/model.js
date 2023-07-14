@@ -26,6 +26,15 @@ const storeSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  openingTime: {
+    type: String,
+    required: true,
+  },
+
+  closingTime: {
+    type: String,
+    required: true,
+  },
   createdBy: {
     type: ObjectID,
     required: true,

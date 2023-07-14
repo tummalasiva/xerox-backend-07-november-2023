@@ -6,6 +6,11 @@
  */
 
 const filesHelper = require("@services/helper/files");
+const utilsHelper = require("@generics/utils");
+const pdf = require("page-count");
+
+var request = require("request-promise");
+const { default: axios } = require("axios");
 
 module.exports = class File {
   /**
@@ -24,6 +29,15 @@ module.exports = class File {
         req.decodedToken._id,
         req.query.dynamicPath ? req.query.dynamicPath : ""
       );
+      // let pdfPath = await utilsHelper.getDownloadableUrl(
+      //   signedUrlResponse.result.filePath
+      // );
+
+      // // let buffer = await axios.get(pdfPath, { responseType: "blob" });
+      // // console.log(buffer, "buffer");
+      // // let pagesPdf = await pdf.PdfCounter.count(buffer);
+      // // console.log(pagesPdf, "pagesPdf");
+
       return signedUrlResponse;
     } catch (error) {
       return error;
@@ -42,7 +56,15 @@ module.exports = class File {
       const downlopadUrlResponse = await filesHelper.getDownloadableUrl(
         req.query.filePath
       );
-      return downlopadUrlResponse;
+
+      let buffer = await request.get(downlopadUrlResponse.result, {
+        encoding: null,
+      });
+
+      let pagesPdf = await pdf.PdfCounter.count(buffer);
+      console.log(pagesPdf, "pagesPdf");
+
+      return { ...downlopadUrlResponse, custom: { pagesPdf } };
     } catch (error) {
       return error;
     }
