@@ -86,7 +86,7 @@ module.exports = class StoreHelper {
         params.pageSize,
         params.searchText
       );
-      console.log("storrrrrrr", store);
+      console.log(store);
       if (store[0].data.length < 1) {
         return common.successResponse({
           statusCode: httpStatusCode.ok,

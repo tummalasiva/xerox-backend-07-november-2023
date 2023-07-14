@@ -16,7 +16,7 @@ module.exports = class SystemUsers {
     try {
       const createdAccount = await systemUsersHelper.create(
         params,
-        "64a7d918c873e2c7cf502ca2"
+        req.decodedToken._id
       );
       return createdAccount;
     } catch (error) {
