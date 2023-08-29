@@ -57,6 +57,7 @@ module.exports = class paymentHelper {
     }
   }
 
+  //
   static async confirm(params) {
     try {
       let body = params.razorpay_order_id + "|" + params.razorpay_payment_id;

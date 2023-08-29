@@ -139,20 +139,11 @@ async function sendPushNotification(fcm_token, title, body) {
       .messaging()
       .sendEachForMulticast({
         data: { title: title || "New Message" },
-        notification: { body: "Hii", title: title },
+        notification: { body: body.orderId, title: title },
         tokens: fcm_token,
       })
       .then((res) => console.log(res.responses, "response"))
       .catch((err) => console.log(err, "error"));
-
-    // FCM.sendToMultipleToken(message, fcm_token, function (err, resp) {
-    //   if (err) {
-    //     console.log(err, "error");
-    //     throw err;
-    //   } else {
-    //     console.log(resp, "Successfully sent notification");
-    //   }
-    // });
   } catch (err) {
     throw err;
   }
