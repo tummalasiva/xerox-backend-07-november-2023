@@ -8,29 +8,32 @@
 //Dependencies
 // const sgMail = require('@sendgrid/mail')
 // sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
-const axios = require('axios');
+const axios = require("axios");
 
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    // port: 587,
-    auth: {
-        user: 'rakesh.doddmane@gmail.com',
-        pass: 'asdasdasd'
-    }
+  host: "smtp.gmail.com",
+  // port: 587,
+  auth: {
+    user: "rakesh.doddmane@gmail.com",
+    pass: "asdasdasd",
+  },
 });
 
-
 var admin = require("firebase-admin");
-var fcm = require('fcm-notification');
+var fcm = require("fcm-notification");
 // send email
 
+const { initializeApp } = require("firebase-admin/app");
+
 var serviceAccount = require("@configs/firebasekey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 const certPath = admin.credential.cert(serviceAccount);
-var FCM = new fcm(certPath);
-
-
+var FCM = new fcm(serviceAccount);
 
 /**
  * Send Email
@@ -45,114 +48,118 @@ var FCM = new fcm(certPath);
  * @returns {JSON} Returns response of the email sending information
  */
 async function sendEmail(params) {
-	try {
+  try {
+    console.log("------------------------------");
+    let fromMail = process.env.SENDGRID_FROM_MAIL;
+    if (params.from) {
+      fromMail = params.from;
+    }
+    const to = params.to.split(",");
 
-		console.log("------------------------------");
-		let fromMail = process.env.SENDGRID_FROM_MAIL
-		if (params.from) {
-			fromMail = params.from
-		}
-		const to = params.to.split(',')
+    let message = {
+      from: fromMail, // sender address
+      to: to, // list of receivers
+      subject: params.subject, // Subject line
+      html: params.body,
+    };
+    if (params.cc) {
+      message["cc"] = params.cc.split(",");
+    }
+    if (params.replyTo) {
+      message["replyTo"] = params.replyTo;
+    }
+    try {
+      console.log("------------------------------");
+      let response = await transporter.sendMail({
+        from: "rakesh.doddmane@gmail.com",
+        to: "rakesh.k@pacewisdom.com",
+        subject: "Test Email Subject",
+        text: "Example Plain Text Message Body",
+      });
 
-		let message = {
-			from: fromMail, // sender address
-			to: to, // list of receivers
-			subject: params.subject, // Subject line
-			html: params.body,
-		}
-		if (params.cc) {
-			message['cc'] = params.cc.split(',')
-		}
-		if (params.replyTo) {
-			message['replyTo'] = params.replyTo
-		}
-		try {
-			console.log("------------------------------");
-			let response = await transporter.sendMail({
-				from: 'rakesh.doddmane@gmail.com',
-				to: 'rakesh.k@pacewisdom.com',
-				subject: 'Test Email Subject',
-				text: 'Example Plain Text Message Body'
-			});
-
-			console.log("------------------------------",response);
-			// await sgMail.send(message)
-		} catch (error) {
-			console.log("==================",error);
-			if (error.response) {
-				return error
-			}
-		}
-		return {
-			status: 'success',
-			message: 'successfully mail sent',
-		}
-	} catch (error) {
-		return {
-			status: 'failed',
-			message: 'Mail server is down, please try after some time',
-			errorObject: error,
-		}
-	}
+      console.log("------------------------------", response);
+      // await sgMail.send(message)
+    } catch (error) {
+      console.log("==================", error);
+      if (error.response) {
+        return error;
+      }
+    }
+    return {
+      status: "success",
+      message: "successfully mail sent",
+    };
+  } catch (error) {
+    return {
+      status: "failed",
+      message: "Mail server is down, please try after some time",
+      errorObject: error,
+    };
+  }
 }
-
 
 async function sendSms(params) {
-	try {
+  try {
+    params["sender"] = process.env.SMS_SENDER_ID;
+    params["service"] = "T";
 
-		params['sender'] = process.env.SMS_SENDER_ID;
-		params['service'] = "T";
+    let data = await axios({
+      method: "post",
+      headers: {
+        Authorization: "Bearer " + process.env.SMS_ACCESS_KEY,
+        "Content-Type": "application/json",
+      },
+      url: process.env.SMS_ENDPOINT,
+      data: params,
+    });
 
-		let data = await axios({
-			method: 'post',
-			headers: {'Authorization': "Bearer "+process.env.SMS_ACCESS_KEY, 'Content-Type':'application/json' },
-			url: process.env.SMS_ENDPOINT,
-			data: params
-		  });
-
-	
-
-		return {
-			status: 'success',
-			message: data,
-		}
-
-	} catch (error) {
-		return {
-			status: 'failed',
-			message: 'Mail server is down, please try after some time',
-			errorObject: error,
-		}
-	}
+    return {
+      status: "success",
+      message: data,
+    };
+  } catch (error) {
+    return {
+      status: "failed",
+      message: "Mail server is down, please try after some time",
+      errorObject: error,
+    };
+  }
 }
-async function sendPushNotification(fcm_token, title, body){
+async function sendPushNotification(fcm_token, title, body) {
+  console.log(body, title, fcm_token, "pushpayload");
+  try {
+    let message = {
+      notification: {
+        title: title,
+        body: body,
+      },
+    };
 
-    try{
-        let message = {
-                notification: {
-                    title: title,
-                    body: body,
-                }
-        };
+    admin
+      .messaging()
+      .sendEachForMulticast({
+        data: { title: title || "New Message" },
+        notification: { body: "Hii", title: title },
+        tokens: fcm_token,
+      })
+      .then((res) => console.log(res.responses, "response"))
+      .catch((err) => console.log(err, "error"));
 
-        FCM.sendToMultipleToken(message,fcm_token, function(err, resp) {
-            if(err){
-                throw err;
-            }else{
-                console.log(resp,'Successfully sent notification');
-            }
-        });
-
-    }catch(err){
-        throw err;
-        }
-
-    }
-
-
+    // FCM.sendToMultipleToken(message, fcm_token, function (err, resp) {
+    //   if (err) {
+    //     console.log(err, "error");
+    //     throw err;
+    //   } else {
+    //     console.log(resp, "Successfully sent notification");
+    //   }
+    // });
+  } catch (err) {
+    throw err;
+  }
+}
 
 module.exports = {
-	sendEmail: sendEmail,
-	sendSms: sendSms,
-	sendPushNotification:sendPushNotification
-}
+  sendEmail: sendEmail,
+  sendSms: sendSms,
+  sendPushNotification: sendPushNotification,
+};
