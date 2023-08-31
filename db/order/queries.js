@@ -69,6 +69,7 @@ module.exports = class OrdersData {
             copies: 1,
             color: 1,
             paperSize: 1,
+            orderLater: 1,
             //paperQuality: 1,
             binding: 1,
             storeId: 1,

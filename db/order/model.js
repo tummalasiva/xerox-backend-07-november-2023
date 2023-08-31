@@ -5,6 +5,10 @@ const Schema = mongoose.Schema;
 const mongooseLeanGetter = require("mongoose-lean-getters");
 
 const orderSchema = new Schema({
+  orderLater: {
+    type: Boolean,
+    default: false,
+  },
   userId: {
     type: ObjectID,
     required: true,
@@ -24,6 +28,10 @@ const orderSchema = new Schema({
       },
       copies: {
         type: Number,
+        required: true,
+      },
+      pageRange: {
+        type: Array,
         required: true,
       },
       colors: {

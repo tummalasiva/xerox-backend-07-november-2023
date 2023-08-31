@@ -547,6 +547,7 @@ module.exports = class AccountHelper {
    * @param {Object} req -request data.
    * @param {string} bodyData.email - user email.
    * @param {string} bodyData.otp - user otp.
+   * @param {string} bodyData.mobile - user mobile number.
    * @param {string} bodyData.password - user password.
    * @returns {JSON} - returns password reset response
    */
@@ -561,9 +562,11 @@ module.exports = class AccountHelper {
       "location.deleted": 0,
       "location._id": 0,
     };
+
+    console.log(bodyData, ":::::::::::::::");
     try {
       let user = await usersData.findOne(
-        { "email.address": bodyData.email },
+        { "email.address": bodyData.email, mobile: bodyData.mobile },
         projection
       );
       if (!user) {

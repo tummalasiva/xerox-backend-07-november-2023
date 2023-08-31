@@ -90,6 +90,7 @@ module.exports = class paymentHelper {
             paidAt: new Date(),
             isPaid: true,
             status: "paid",
+            orderLater: false,
           }
         );
 

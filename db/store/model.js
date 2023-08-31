@@ -4,6 +4,17 @@ const Schema = mongoose.Schema;
 
 const mongooseLeanGetter = require("mongoose-lean-getters");
 
+const locationSchema = new Schema({
+  x: {
+    type: Number,
+    required: true,
+  },
+  y: {
+    type: Number,
+    required: true,
+  },
+});
+
 const storeSchema = new Schema({
   name: {
     type: String,
@@ -15,7 +26,7 @@ const storeSchema = new Schema({
     required: true,
   },
   location: {
-    type: Object,
+    type: locationSchema,
     required: true,
   },
   meta: {

@@ -51,6 +51,8 @@ module.exports = class OrderHelper {
           body.items.map(async (item, index) => {
             body.items[index]["documents"] = item.document;
 
+            body.items[index]["pageRange"] = item.pageRange;
+
             // sides
             let side_price = 0;
             if (item.sides == "one") {
@@ -197,6 +199,8 @@ module.exports = class OrderHelper {
       let filters = {};
       if (role == "customer") {
         filters["userId"] = ObjectId(userId);
+      } else {
+        filters["orderLater"] = false;
       }
 
       if (params.query.storeId) {
