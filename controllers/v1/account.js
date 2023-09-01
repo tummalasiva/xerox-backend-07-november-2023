@@ -120,6 +120,16 @@ module.exports = class Account {
     }
   }
 
+  async generateResetPasswordOtp(req) {
+    const params = req.body;
+    try {
+      const result = await accountHelper.generateResetPasswordOtp(params);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
   /**
    * Reset password
    * @method
@@ -135,6 +145,16 @@ module.exports = class Account {
     const params = req.body;
     try {
       const result = await accountHelper.resetPassword(params);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async resetForgotPassword(req) {
+    const params = req.body;
+    try {
+      const result = await accountHelper.resetForgotPassword(params);
       return result;
     } catch (error) {
       return error;

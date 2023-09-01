@@ -371,6 +371,81 @@ module.exports = class AccountHelper {
   }
 
   /**
+   * generate resetPassword Otp
+   * @method
+   * @name generateResetPasswordOtp
+   * @param {Object} bodyData -request data.
+   * @param {string} bodyData.mobile - user mobile.
+   * @returns {JSON} - returns otp success response
+   */
+
+  static async generateResetPasswordOtp(bodyData) {
+    try {
+      let otp;
+      let isValidOtpExist = true;
+      const user = await usersData.findOne({ mobile: bodyData.mobile });
+      if (!user) {
+        return common.failureResponse({
+          message: "USER_DOESNOT_EXISTS",
+          statusCode: httpStatusCode.bad_request,
+          responseCode: "CLIENT_ERROR",
+        });
+      }
+
+      bodyData.name = user.name;
+
+      const userData = await utilsHelper.redisGet(bodyData.mobile);
+
+      if (userData && userData.action === "forgetpassword") {
+        otp = userData.otp; // If valid then get previuosly generated otp
+        console.log(otp);
+      } else {
+        isValidOtpExist = false;
+      }
+
+      if (!isValidOtpExist) {
+        otp = Math.floor(Math.random() * 900000 + 100000); // 6 digit otp
+        const redisData = {
+          verify: bodyData.mobile,
+          action: "forgetpassword",
+          otp,
+        };
+        const res = await utilsHelper.redisSet(
+          bodyData.mobile,
+          redisData,
+          common.otpExpirationTime
+        );
+        if (res !== "OK") {
+          return common.failureResponse({
+            message: "UNABLE_TO_SEND_OTP",
+            statusCode: httpStatusCode.internal_server_error,
+            responseCode: "SERVER_ERROR",
+          });
+        }
+      }
+
+      let smsInfo2 = await notifications.sendSms({
+        to: bodyData.mobile,
+        message: utilsHelper.composeEmailBody(common.FORGOT_OTP, {
+          name: bodyData.name,
+          otp,
+        }),
+        template_id: process.env.FORGOT_OTP_TEMPLATE_ID,
+      });
+
+      return common.successResponse({
+        statusCode: httpStatusCode.ok,
+        message: "OTP_SENT_SUCCESSFULLY",
+        result: {
+          otp: otp,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
    * generate otp
    * @method
    * @name generateOtp
@@ -384,7 +459,7 @@ module.exports = class AccountHelper {
     try {
       let otp;
       let isValidOtpExist = true;
-      const user = await usersData.findOne({ "email.address": bodyData.email });
+      const user = await usersData.findOne({ mobile: bodyData.mobile });
       if (!user) {
         return common.failureResponse({
           message: "USER_DOESNOT_EXISTS",
@@ -543,6 +618,108 @@ module.exports = class AccountHelper {
   /**
    * Reset password
    * @method
+   * @name resetForgotPassword
+   * @param {Object} req -request data.
+   * @param {string} bodyData.otp - user otp.
+   * @param {string} bodyData.mobile - user mobile number.
+   * @param {string} bodyData.password - user password.
+   * @returns {JSON} - returns password reset response
+   */
+
+  static async resetForgotPassword(bodyData) {
+    const projection = {
+      refreshTokens: 0,
+      "designation.deleted": 0,
+      "designation._id": 0,
+      "areasOfExpertise.deleted": 0,
+      "areasOfExpertise._id": 0,
+      "location.deleted": 0,
+      "location._id": 0,
+    };
+
+    console.log(bodyData, ":::::::::::::::");
+    try {
+      let user = await usersData.findOne(
+        { mobile: bodyData.mobile },
+        projection
+      );
+      if (!user) {
+        return common.failureResponse({
+          message: "USER_DOESNOT_EXISTS",
+          statusCode: httpStatusCode.bad_request,
+          responseCode: "CLIENT_ERROR",
+        });
+      }
+
+      const redisData = await utilsHelper.redisGet(bodyData.mobile);
+      if (!redisData || redisData.otp != bodyData.otp) {
+        return common.failureResponse({
+          message: "RESET_OTP_INVALID",
+          statusCode: httpStatusCode.bad_request,
+          responseCode: "CLIENT_ERROR",
+        });
+      }
+
+      const salt = bcryptJs.genSaltSync(10);
+      bodyData.password = bcryptJs.hashSync(bodyData.password, salt);
+
+      const tokenDetail = {
+        data: {
+          _id: user._id,
+          email: user.email.address,
+          name: user.name,
+          isAMentor: user.isAMentor,
+        },
+      };
+
+      const accessToken = utilsHelper.generateToken(
+        tokenDetail,
+        process.env.ACCESS_TOKEN_SECRET,
+        "1d"
+      );
+      const refreshToken = utilsHelper.generateToken(
+        tokenDetail,
+        process.env.REFRESH_TOKEN_SECRET,
+        "183d"
+      );
+
+      const updateParams = {
+        $push: {
+          refreshTokens: {
+            token: refreshToken,
+            exp: new Date().getTime() + common.refreshTokenExpiryInMs,
+          },
+        },
+        lastLoggedInAt: new Date().getTime(),
+        password: bodyData.password,
+      };
+      await usersData.updateOneUser({ _id: user._id }, updateParams);
+
+      await utilsHelper.redisDel(bodyData.mobile);
+
+      /* Mongoose schema is in strict mode, so can not delete otpInfo directly */
+      delete user.password;
+      delete user.otpInfo;
+
+      const result = {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        user,
+      };
+
+      return common.successResponse({
+        statusCode: httpStatusCode.ok,
+        message: "PASSWORD_RESET_SUCCESSFULLY",
+        result,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Reset password
+   * @method
    * @name resetPassword
    * @param {Object} req -request data.
    * @param {string} bodyData.email - user email.
@@ -566,7 +743,7 @@ module.exports = class AccountHelper {
     console.log(bodyData, ":::::::::::::::");
     try {
       let user = await usersData.findOne(
-        { "email.address": bodyData.email, mobile: bodyData.mobile },
+        { mobile: bodyData.mobile },
         projection
       );
       if (!user) {
@@ -577,9 +754,7 @@ module.exports = class AccountHelper {
         });
       }
 
-      const redisData = await utilsHelper.redisGet(
-        bodyData.email.toLowerCase()
-      );
+      const redisData = await utilsHelper.redisGet(bodyData.mobile);
       if (!redisData || redisData.otp != bodyData.otp) {
         return common.failureResponse({
           message: "RESET_OTP_INVALID",
